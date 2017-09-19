@@ -1,0 +1,22 @@
+{
+  "name": "websocket_sample",
+  "homepage": "https://github.com/fdjkgh580/websocket_sample",
+  "authors": [
+    "fdjkgh580 <fdjkgh580@yahoo.com.tw>"
+  ],
+  "dependencies": {
+    "jquery": "master",
+    "vmodel.js": "master",
+    "vpage.js": "master",
+    "file-preview.js": "master"
+  },
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -7,15 +7,19 @@
 	  src="https://code.jquery.com/jquery-3.2.1.min.js"
 	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 	  crossorigin="anonymous"></script>
+	<script src="bower_components/vmodel.js/src/jquery.vmodel.min.js"></script>
+	<script src="bower_components/file-preview.js/src/jquery.file-preview.min.js"></script>
 	<script src="app.js"></script>
 </head>
 <body>
- 
-	<ul class="message-list"></ul>
 
 	<form class="form1">
 
-		<ul class="chat"></ul>
+		<ul class="chat" style="
+			height: 200px;
+			background: #EEEEEE;
+			overflow: auto;
+		"></ul>
 		
 		<p>
 			<input type="text" class="name" autofocus placeholder="暱稱" required>
@@ -23,6 +27,20 @@
 
 		<p>
 			<textarea class="message" cols="30" rows="3" placeholder="想說些什麼" required></textarea>
+		</p>
+
+		<p>
+			<input type="file" name="upl[]" class="upl" multiple hidden>
+			<img class="preview" style="
+				border: solid #D9D9D9 1px;
+				display: inline-block;
+				cursor: pointer;
+				width: 150px;
+				height: 150px;
+				background-position: center;
+				background-size: contain;
+				background-repeat: no-repeat;
+			">
 		</p>
 		
 		<p>
