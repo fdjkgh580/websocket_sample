@@ -1,0 +1,16 @@
+.chat {
+	height: 200px;
+	background: #EEEEEE;
+	overflow: auto;
+}
+
+.preview {
+	border: solid #D9D9D9 1px;
+	display: inline-block;
+	cursor: pointer;
+	width: 150px;
+	height: 150px;
+	background-position: center;
+	background-size: contain;
+	background-repeat: no-repeat;
+}

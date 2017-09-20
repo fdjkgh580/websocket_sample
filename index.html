@@ -3,6 +3,7 @@
 <head>
 	<title>Ratchet Test</title>
 	<meta charset="UTF-8"/>
+	<link rel="stylesheet" href="app.css">
 	<script
 	  src="https://code.jquery.com/jquery-3.2.1.min.js"
 	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -15,11 +16,7 @@
 
 	<form class="form1">
 
-		<ul class="chat" style="
-			height: 200px;
-			background: #EEEEEE;
-			overflow: auto;
-		"></ul>
+		<ul class="chat"></ul>
 		
 		<p>
 			<input type="text" class="name" autofocus placeholder="暱稱" required>
@@ -31,16 +28,7 @@
 
 		<p>
 			<input type="file" name="upl[]" class="upl" multiple hidden>
-			<img class="preview" style="
-				border: solid #D9D9D9 1px;
-				display: inline-block;
-				cursor: pointer;
-				width: 150px;
-				height: 150px;
-				background-position: center;
-				background-size: contain;
-				background-repeat: no-repeat;
-			">
+			<img class="preview">
 		</p>
 		
 		<p>
