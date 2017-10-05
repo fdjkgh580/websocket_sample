@@ -117,10 +117,6 @@ $(function() {
 	        }
 	    }
 	});
-	
-
-	
-
 
 	
 	$.vmodel.create({
@@ -136,26 +132,29 @@ $(function() {
 				vs.conn = new WebSocket('ws://websocket.localhost:8080');
 
 				$.extend(vs.conn, {
-					onopen : function(e) {
-						$.vmodel.get("chatHelper").new_user();
-						$.vmodel.get("chatHelper").debug('連線成功。')
-					},
-					onerror : function(e) {
-						$.vmodel.get("chatHelper").debug('伺服器無法連接。')
-					},
-					onclose : function(e) {
-						$.vmodel.get("chatHelper").debug('伺服器斷線。')
-					},
-					onmessage : function(e) {
-						var obj = JSON.parse(e.data);
-						$.vmodel.get("chatHelper").add(obj)
-					}
+					onopen : vs.onopen,
+					onerror : vs.onerror,
+					onclose : vs.onclose,
+					onmessage : vs.onmessage
 				});
-
 	        }
 
-	        this.onopen = function (){
+	        this.onerror = function (e){
+	        	$.vmodel.get("chatHelper").debug('伺服器無法連接。')
+	        }
 
+	        this.onclose = function (e){
+	        	$.vmodel.get("chatHelper").debug('伺服器斷線。')
+	        }
+
+	        this.onmessage = function (e){
+	        	var obj = JSON.parse(e.data);
+	        	$.vmodel.get("chatHelper").add(obj)
+	        }
+
+	        this.onopen = function (e){
+	        	$.vmodel.get("chatHelper").new_user();
+	        	$.vmodel.get("chatHelper").debug('連線成功。')
 	        }
 	    }
 	});
