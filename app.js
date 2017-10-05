@@ -129,7 +129,7 @@ $(function() {
 	        this.autoload = ['connect'];
 	        this.connect = function (){
 
-				vs.conn = new WebSocket('ws://websocket.localhost:8080');
+				vs.conn = new WebSocket('ws://chat.websocket.dennings.org:8080');
 
 				$.extend(vs.conn, {
 					onopen : vs.onopen,
