@@ -1,18 +1,18 @@
 <?php
 require_once 'vendor/autoload.php'; 
 
-
-
 // 建立 websocket 物件，監聽 0.0.0.0:8080 連接埠
 $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
 // 監聽 WebSocket 連接打開事件
 $ws->on('open', function ($ws, $request) {
-	echo "進入編號：{$request->fd}\n";
+	echo "進入者編號：{$request->fd}\n";
 });
 
 // 監聽 WebSocket 訊息事件
 $ws->on('message', function ($ws, $frame) {
+
+	echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
 
  	\Jsnlib\Swoole::push_all([
 		'ws'           => $ws,
@@ -25,7 +25,7 @@ $ws->on('message', function ($ws, $frame) {
 
 // 今天 WebSocket 連接關閉事件
 $ws->on('close', function ($ws, $fd) {
-	echo "離開編號：{$fd}\n";
+	echo "離開者編號：{$fd}\n";
 });
 
 $ws->start();

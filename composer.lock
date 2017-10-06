@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "858ccf2b00629904fbfcaf8568d3cb4b",
+    "content-hash": "1baa09ab34c4218afca59047163c4556",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -303,6 +303,33 @@
             ],
             "abandoned": "guzzle/guzzle",
             "time": "2014-05-01T21:36:02+00:00"
+        },
+        {
+            "name": "jsnlib/swoole",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fdjkgh580/swoole.git",
+                "reference": "8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fdjkgh580/swoole/zipball/8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b",
+                "reference": "8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jsnlib\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "輔助 Swoole 的工具",
+            "time": "2017-10-06T06:23:55+00:00"
         },
         {
             "name": "react/event-loop",

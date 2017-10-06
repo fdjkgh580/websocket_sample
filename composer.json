@@ -8,6 +8,7 @@
     	}
     },
     "require": {
-        "cboden/ratchet": "0.3.*"
+        "cboden/ratchet": "0.3.*",
+        "jsnlib/swoole": "^1.0"
     }
 }
