@@ -2,7 +2,10 @@
     "autoload": {
         "psr-0": {
             "MyApp": "src"
-        }
+        },
+        "psr-4": {
+    		"Jsnlib\\": "src/Jsnlib"
+    	}
     },
     "require": {
         "cboden/ratchet": "0.3.*"
