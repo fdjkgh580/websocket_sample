@@ -36,6 +36,7 @@ $(function (){
                     $.vmodel.get("chatHelper").welcome(obj);
                 } 
                 else if (obj.type == "message") {
+                    // console.log(obj)
                     $.vmodel.get("chatHelper").new_message(obj)
                 }
             }
