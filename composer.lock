@@ -306,16 +306,16 @@
         },
         {
             "name": "jsnlib/swoole",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fdjkgh580/swoole.git",
-                "reference": "8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b"
+                "reference": "23a70c026c223d72776435b8433bcf5cae2d7160"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fdjkgh580/swoole/zipball/8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b",
-                "reference": "8b6b4a8b8013ec163d6e148b306cd83c7bf7ee3b",
+                "url": "https://api.github.com/repos/fdjkgh580/swoole/zipball/23a70c026c223d72776435b8433bcf5cae2d7160",
+                "reference": "23a70c026c223d72776435b8433bcf5cae2d7160",
                 "shasum": ""
             },
             "type": "library",
@@ -329,7 +329,7 @@
                 "MIT"
             ],
             "description": "輔助 Swoole 的工具",
-            "time": "2017-10-06T06:23:55+00:00"
+            "time": "2017-10-12T09:05:25+00:00"
         },
         {
             "name": "react/event-loop",
