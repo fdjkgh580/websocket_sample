@@ -120,7 +120,25 @@ $ws->on('message', function ($ws, $frame) {
 $ws->on('close', function ($ws, $fd) {
 	echo "離開者編號：{$fd}\n";
 
-	print_r($GLOBALS['tablebox']);
+	foreach ($GLOBALS['tablebox'] as $chatroom_name)
+	{
+		$chatroom = $GLOBALS['table']->get($chatroom_name);
+		$users = json_decode($chatroom['user_id'], true);
+
+		if (in_array($fd, $users))
+		{
+			$key = array_search($fd, $users);
+			echo "KEY: " . $key . "\n";
+			unset($users[$key]);
+		}
+		
+		$user_encode = json_encode($users);
+		$GLOBALS['table']->set($chatroom_name, 
+		[
+			'room_id' => $chatroom['room_id'],
+			'user_id' => $user_encode
+		]);
+	}
 
 });
 
