@@ -78,9 +78,13 @@ $ws->on('message', function ($ws, $frame) {
 			]);
 		}
 
-	 	\Jsnlib\Swoole::push_all(
+		$chatroom = $GLOBALS['table']->get($chatroom_name);
+		$users = json_decode($chatroom['user_id']);
+
+	 	\Jsnlib\Swoole::push_target(
 		[
 			'ws'           => $ws,
+			'target'       => $users,
 			'self'         => $frame->fd,
 			'is_send_self' => true,
 			'data'         => json_encode(
@@ -97,22 +101,15 @@ $ws->on('message', function ($ws, $frame) {
 		
 		$chatroom = $GLOBALS['table']->get($chatroom_name);
 		$users = json_decode($chatroom['user_id']);
-		foreach ($users as $user_id)
-		{
-			if ($user_id == $frame->fd) continue;
-			
-			$ws->push($user_id, $frame->data);
-		}
 
-
-
-	 // 	\Jsnlib\Swoole::push_all(
-		// [
-		// 	'ws'           => $ws,
-		// 	'self'         => $frame->fd,
-		// 	'is_send_self' => false,
-		// 	'data'         => $frame->data
-	 // 	]);
+	 	\Jsnlib\Swoole::push_target(
+		[
+			'ws'           => $ws,
+			'target'       => $users,
+			'self'         => $frame->fd,
+			'is_send_self' => false,
+			'data'         => $frame->data
+	 	]);
 	}
 
 
