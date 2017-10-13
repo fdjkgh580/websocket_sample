@@ -23,11 +23,53 @@ $ws->on('message', function ($ws, $frame) {
 	echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
 
 	$room =& $GLOBALS['room'];
-	$obj = $room->decode_user_data($frame->data);
+	list($obj, $chatroom) = $room->decode_user_data($frame->data);
+
+
+	if ($obj->type == "join") 
+	{
+		if ( ! $room->is_exits()) 
+		{
+			// 建立群組
+			$room->create();
+		}
+
+		if ( ! $room->is_user())
+		{
+			// 加入第一個使用者
+			$room->first_user();	
+		}
+		else 
+		{
+			// 追加使用者
+			$room->add_user();
+		}
+
+		// 提醒使用者
+		$room->notice();
+
+	}
+	elseif ($obj->type == "message")
+	{
+		// 發送給場內的所有使用者
+		$room->push_message();
+	}
+
+
+
+
+
+
+
+
+
+	die;
+
 
 	// 加入群組
 	if ($obj->type == "join") 
 	{
+
 		// 若建立群組
 		if (empty( $GLOBALS['table']->get($chatroom_name)))
 		{
