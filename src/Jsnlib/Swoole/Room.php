@@ -20,4 +20,18 @@ class Room
 
 		return $this->table;
 	}
+
+	/**
+	 * [frame description]
+	 * @param  [type] $json_data     [description]
+	 * @param  string $chatroom_name 房間名稱
+	 * @return array                 [接收到 json 解碼後的物件, 房間名稱]
+	 */
+	public function decode_user_data($json_data, $chatroom_name = "chatroom"): array
+	{
+		$obj = json_decode($json_data);
+		$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
+
+		return [$obj, $chatroom_name];
+	}
 }

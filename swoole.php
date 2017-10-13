@@ -4,11 +4,11 @@ require_once 'vendor/autoload.php';
 // 1. 建立 websocket 物件，監聽 0.0.0.0:8080 連接埠
 $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
-$room = new \Jsnlib\Swoole\Room;
-$GLOBALS['table'] = $room->start(1024);
+$GLOBALS['room'] = new \Jsnlib\Swoole\Room;
+$GLOBALS['table'] = $GLOBALS['room']->start(1024);
 
 // 3.1 所有的聊天室名稱
-$tablebox = [];
+// $tablebox = [];
 
 // 4. 監聽 WebSocket 連接打開事件
 $ws->on('open', function ($ws, $request) {
@@ -20,11 +20,10 @@ $ws->on('open', function ($ws, $request) {
 // 監聽 WebSocket 訊息事件
 $ws->on('message', function ($ws, $frame) {
 
-
 	echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
 
-	$obj = json_decode($frame->data);
-	$chatroom_name = "chatroom_{$obj->room_id}";
+	$room =& $GLOBALS['room'];
+	$obj = $room->decode_user_data($frame->data);
 
 	// 加入群組
 	if ($obj->type == "join") 
