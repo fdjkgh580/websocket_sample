@@ -53,7 +53,7 @@ class Room
 	 */
 	public function is_no_one($chatroom_name): bool
 	{
-		$chatroom = $this->table->get($chatroom_name);
+		$chatroom = $this->chatroom($chatroom_name);
 		return empty($chatroom['user_id']);
 	}
 
@@ -184,7 +184,7 @@ class Room
 				'user_id' => $user_encode
 			]);
 
-			// $chatroom = $this->table->get($chatroom_name);
+			// $chatroom = $this->chatroom($chatroom_name);
 		}
 	}
 
@@ -193,14 +193,33 @@ class Room
 	 * @param   string $chatroom_name   聊天室名稱
 	 * @return  array  [array 聊天室, array 使用者編號]
 	 */
-	protected function userlist($chatroom_name, $chatroom = false): array
+	public function userlist($chatroom_name): array
 	{
-		$chatroom = $this->table->get($chatroom_name);
+		$chatroom = $this->chatroom($chatroom_name);
 		
 		if (empty($chatroom['user_id'])) return [$chatroom, false];
 
 		$user_id_box = json_decode($chatroom['user_id'], true);
 
 		return [$chatroom, $user_id_box];
+	}
+
+
+	/**
+	 * 取得聊天室
+	 * @param   $chatroom_name 
+	 */
+	public function chatroom($chatroom_name = false): array
+	{
+		if ($chatroom_name !== false) return $this->table->get($chatroom_name);
+
+		$collection = [];
+
+		foreach ($this->box as $box_chatroom_name)
+		{
+			$collection[] = $this->table->get($box_chatroom_name);
+		}
+
+		return $collection;
 	}
 }

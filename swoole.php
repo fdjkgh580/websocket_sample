@@ -189,6 +189,10 @@ $ws->on('close', function ($ws, $fd) {
 	$room =& $GLOBALS['room'];
 	$room->leave($fd);
 
+
+	$collection = $room->chatroom();
+	print_r($collection);
+	echo "\n";
 });
 
 $ws->start();
