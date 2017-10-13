@@ -23,47 +23,77 @@ $ws->on('message', function ($ws, $frame) {
 	echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
 
 	$room =& $GLOBALS['room'];
-	list($obj, $chatroom) = $room->decode_user_data($frame->data);
+	list($obj, $chatroom_name) = $room->decode_user_data($frame->data);
 
 
 	if ($obj->type == "join") 
 	{
-		if ( ! $room->is_exits()) 
+		// 若建立群組
+		if ( ! $room->is_exits($chatroom_name)) 
 		{
-			// 建立群組
-			$room->create();
+			echo "建立群組 $chatroom_name \n";
+
+			$room->create(
+			[
+				'chatroom_name' => $chatroom_name,
+				'room_id'       => $obj->room_id,
+			]);
 		}
 
-		if ( ! $room->is_user())
+		// 若群組沒有人
+		if ($room->is_no_one($chatroom_name))
 		{
+			echo "群組 $chatroom_name 加入第一個使用者 $frame->fd \n";
+
 			// 加入第一個使用者
-			$room->first_user();	
+			$room->first_user(
+			[
+				'chatroom_name' => $chatroom_name,
+				'room_id'       => $obj->room_id,
+				'user_id'       => $frame->fd
+			]);
 		}
 		else 
 		{
+			echo "群組 $chatroom_name 追加使用者 $frame->fd \n";
+
 			// 追加使用者
-			$room->add_user();
+			$room->add_user(
+			[
+				'chatroom_name' => $chatroom_name,
+				'room_id'       => $obj->room_id,
+				'user_id'       => $frame->fd
+			]);
 		}
 
 		// 提醒使用者
-		$room->notice();
+		$room->welcome(
+		[
+			'chatroom_name' => $chatroom_name,
+			'ws' => $ws,
+			'self' => $frame->fd,
+			'data' => [
+				'type' => 'into',
+				'name' => $obj->name
+			]
+		]);
 
 	}
 	elseif ($obj->type == "message")
 	{
 		// 發送給場內的所有使用者
-		$room->push_message();
+		$room->push_message(
+		[
+			'chatroom_name' => $chatroom_name,
+			'ws'            => $ws,
+			'self'          => $frame->fd,
+			'data'          => $frame->data
+		]);
 	}
 
 
 
-
-
-
-
-
-
-	die;
+	return true;
 
 
 	// 加入群組
@@ -156,25 +186,8 @@ $ws->on('message', function ($ws, $frame) {
 $ws->on('close', function ($ws, $fd) {
 	echo "離開者編號：{$fd}\n";
 
-	foreach ($GLOBALS['tablebox'] as $chatroom_name)
-	{
-		$chatroom = $GLOBALS['table']->get($chatroom_name);
-		$users = json_decode($chatroom['user_id'], true);
-
-		if (in_array($fd, $users))
-		{
-			$key = array_search($fd, $users);
-			echo "KEY: " . $key . "\n";
-			unset($users[$key]);
-		}
-		
-		$user_encode = json_encode($users);
-		$GLOBALS['table']->set($chatroom_name, 
-		[
-			'room_id' => $chatroom['room_id'],
-			'user_id' => $user_encode
-		]);
-	}
+	$room =& $GLOBALS['room'];
+	$room->leave($fd);
 
 });
 

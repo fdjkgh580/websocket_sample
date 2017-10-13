@@ -39,6 +39,9 @@ $(function (){
                     // console.log(obj)
                     $.vmodel.get("chatHelper").new_message(obj)
                 }
+                else {
+                    $.vmodel.get("chatHelper").debug('接收到的訊息無法分類');
+                }
             }
 
             this.onopen = function (e){
