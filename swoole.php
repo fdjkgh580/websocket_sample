@@ -4,13 +4,8 @@ require_once 'vendor/autoload.php';
 // 1. 建立 websocket 物件，監聽 0.0.0.0:8080 連接埠
 $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
-// 2. 建立表格的大小，需要是 2 的次方
-$GLOBALS['table'] = $table = new swoole_table(1024);
-
-// 3. 建立欄位
-$table->column('room_id', swoole_table::TYPE_INT);
-$table->column('user_id', swoole_table::TYPE_STRING, 256);
-$table->create();
+$room = new \Jsnlib\Swoole\Room;
+$GLOBALS['table'] = $room->start(1024);
 
 // 3.1 所有的聊天室名稱
 $tablebox = [];
