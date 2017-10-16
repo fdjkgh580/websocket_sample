@@ -52,6 +52,16 @@ $ws->on('message', function ($ws, $frame) {
 				'room_id'       => $obj->room_id,
 				'user_id'       => $frame->fd
 			]);
+
+			// 記錄使用者
+			$room->user_insert(
+			[
+				'user_key' => $frame->fd,
+				'user_val' => 
+				[
+					'name' => $obj->name
+				]
+			]);
 		}
 		else 
 		{
@@ -106,17 +116,31 @@ $ws->on('close', function ($ws, $fd) {
 	// $result['room_id'];
 	// $result['user_id'];
 
-	// 取得使用者資料
+	// 取得使用者資料/名稱
+	$userdata = $room->user_get($fd);
 	
+	echo "Leave -------- \n\n";
+	print_r($userdata['name']);
+	echo "\n";
+	echo "Leave -------- \n\n";
+
+	
+
+	// // 訊息通知該聊天室的所有人
+	// $room->buybuy(
+	// [
+	// 	'chatroom_name' => '',
+	// 	'ws' => $ws,
+	// 	'self' => $fd,
+	// 	'data' => 
+	// 	[
+	// 		'name' => $userdata['name']
+	// 	]
+	// ]);
 
 	// 離開聊天室
 	$room->leave($fd);
 
-	// 使用者在哪個聊天室
-
-	// $collection = $room->chatroom();
-	// print_r($collection);
-	// echo "\n";
 });
 
 $ws->start();

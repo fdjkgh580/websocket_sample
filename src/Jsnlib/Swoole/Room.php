@@ -9,6 +9,13 @@ class Room
 	// 所有的聊天室名稱
 	protected $box = [];
 
+	protected $uobj;
+
+	function __construct()
+	{
+		$this->uobj = new \Jsnlib\Swoole\User;
+	}
+
 	public function start($size = 1024)
 	{
 		// 2. 建立表格的大小，需要是 2 的次方
@@ -24,7 +31,7 @@ class Room
 
 	/**
 	 * 解碼使用者的數據
-	 * @param  [type] $json_data     使用者的 json 加密數據
+	 * @param  string $json_data     使用者的 json 加密數據
 	 * @param  string $chatroom_name 房間名稱
 	 * @return array                 [接收到 json 解碼後的物件, 房間名稱]
 	 */
@@ -32,7 +39,6 @@ class Room
 	{
 		$obj = json_decode($json_data);
 		$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
-
 		return [$obj, $chatroom_name];
 	}
 
@@ -293,6 +299,22 @@ class Room
 	}
 
 	/**
+	 * 記錄使用者
+	 * @param   int   user_key  使用者辨識鍵
+	 * @param   array user_val  使用者的附加資料
+	 */
+	public function user_insert($param): bool
+	{
+		$this->uobj->insert($param['user_key'], $param['user_val']);
+		return true;
+	}
+
+	public function user_get($user_key)
+	{
+		return $this->uobj->get($user_key);
+	}
+
+	/**
 	 * @param   string 	    chatroom_name
 	 * @param   object      ws
 	 * @param   int/string  self
@@ -303,4 +325,10 @@ class Room
 	{
 
 	}
+
+	// public function name($room_id, $chatroom_name = "chatroom")
+	// {
+	// 	$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
+
+	// }
 }
