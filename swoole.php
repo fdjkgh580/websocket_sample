@@ -112,18 +112,12 @@ $ws->on('close', function ($ws, $fd) {
 
 	// 使用者離開前在哪個聊天室
 	$result = $room->where($fd);
-	if ($result == false) throw new \Exception("發生錯誤");
 	// $result['room_id'];
 	// $result['user_id'];
+	if ($result == false) throw new \Exception("發生錯誤");
 
 	// 取得使用者資料/名稱
 	$userdata = $room->user_get($fd);
-	
-	// echo "Leave -------- \n\n";
-	// print_r($userdata['name']);
-	// echo "\n";
-	// echo "Leave -------- \n\n";
-
 	
 
 	// 訊息通知該聊天室的所有人
