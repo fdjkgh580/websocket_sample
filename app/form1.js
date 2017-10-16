@@ -33,6 +33,12 @@ $(function (){
                 });
             }
 
+            this.reset_message = function (){
+                $(".message").val('').focus();
+                $(".upl").val(null);
+                $(".preview").css("background-image", 'url(null)').removeAttr("data-base64")
+            }
+
             // 送出表單
             this.submit = function (){
                 vs.root.on("submit", function (){
@@ -58,6 +64,8 @@ $(function (){
 
                     // 訊息滾到置底
                     $("ul.chat").scrollTop($("ul.chat").height());
+
+                    vs.reset_message();
 
                     return false;
                 });

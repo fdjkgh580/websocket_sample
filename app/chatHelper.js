@@ -25,7 +25,6 @@ $(function (){
                     '</li>';
 
                 $(".chat").append(li)
-                this.reset_message();
             }
             this.welcome = function (obj){
                 var username = $(".name").val();
@@ -36,11 +35,6 @@ $(function (){
                     '</li>';
 
                 $(".chat").append(li);
-            }
-            this.reset_message = function (){
-                $(".message").val('').focus();
-                $(".upl").val(null);
-                $(".preview").css("background-image", 'url(null)').removeAttr("data-base64")
             }
             this.name_lcok = function (){
                 $(".name").prop("disabled", true);
