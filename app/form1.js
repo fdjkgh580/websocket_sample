@@ -56,6 +56,9 @@ $(function (){
                     $.vmodel.get("chatHelper").new_message(data)
                     $.vmodel.get("chatHelper").name_lcok();
 
+                    // 訊息滾到置底
+                    $("ul.chat").scrollTop($("ul.chat").height());
+
                     return false;
                 });
                 

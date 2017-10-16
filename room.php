@@ -3,7 +3,7 @@
 <head>
 	<title>Ratchet Test</title>
 	<meta charset="UTF-8"/>
-	<link rel="stylesheet" href="app.css">
+	<link rel="stylesheet" href="app.css?t=<?=time()?>">
 	<script
 	  src="https://code.jquery.com/jquery-3.2.1.min.js"
 	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -26,9 +26,7 @@
 		<p>
 			<?=$_POST['name']?>: <br>
 			<textarea class="message" cols="30" rows="3" placeholder="想說些什麼" required autofocus></textarea>
-		</p>
-
-		<p>
+		
 			<input type="file" name="upl[]" class="upl" multiple hidden>
 			<img class="preview">
 		</p>
