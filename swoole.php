@@ -99,12 +99,24 @@ $ws->on('close', function ($ws, $fd) {
 	echo "離開者編號：{$fd}\n";
 
 	$room =& $GLOBALS['room'];
+
+	// 使用者離開前在哪個聊天室
+	$result = $room->where($fd);
+	if ($result == false) throw new \Exception("發生錯誤");
+	// $result['room_id'];
+	// $result['user_id'];
+
+	// 取得使用者資料
+	
+
+	// 離開聊天室
 	$room->leave($fd);
 
+	// 使用者在哪個聊天室
 
-	$collection = $room->chatroom();
-	print_r($collection);
-	echo "\n";
+	// $collection = $room->chatroom();
+	// print_r($collection);
+	// echo "\n";
 });
 
 $ws->start();

@@ -213,13 +213,94 @@ class Room
 	{
 		if ($chatroom_name !== false) return $this->table->get($chatroom_name);
 
-		$collection = [];
+		$this->collection = [];
 
-		foreach ($this->box as $box_chatroom_name)
+		$this->each(function ($key, $chatroom_name)
 		{
-			$collection[] = $this->table->get($box_chatroom_name);
+			$this->collection[] = $this->table->get($box_chatroom_name);
+		});
+
+		$c = $this->collection;
+		unset($this->collection);
+
+		return $c;
+	}
+
+
+	/**
+	 * 搜尋使用者在哪個聊天室
+	 * @param   fd
+	 * @return  [int room_id, array user_id]
+	 */
+	public function where($fd): array
+	{
+		foreach ($this->map() as $key => $chatroom)
+		{
+			if ($this->is_in_room($fd, $chatroom) == false) continue;
+
+			return $chatroom;
 		}
 
-		return $collection;
+		return false;
+	}
+
+	/**
+	 * 使用者是否在某個房間內？
+	 * @param    $fd       
+	 * @param    $chatroom 
+	 */
+	public function is_in_room($fd, array $chatroom): bool
+	{
+		return in_array($fd, $chatroom['user_id']);
+	}
+
+	/**
+	 * 取得所有房間與內部的使用者編號
+	 */
+	public function map(): array
+	{
+		$this->temp = [];
+
+		$this->each(function ($key, $chatroom_name)
+		{
+			$result = $this->table->get($chatroom_name);
+
+			$this->temp[] = 
+			[
+				'room_id' => $result['room_id'],
+				'user_id' => json_decode($result['user_id'], true)
+			];
+		});
+
+		$box = $this->temp;
+		unset($this->temp);
+
+		return $box;
+	}
+
+	/**
+	 * 取出所有聊天室
+	 * @param  callable $callback(鍵, 聊天室名稱)
+	 */
+	protected function each(callable $callback)
+	{
+		foreach ($this->box as $key => $chatroom_name)
+		{
+			$callback($key, $chatroom_name);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param   string 	    chatroom_name
+	 * @param   object      ws
+	 * @param   int/string  self
+	 * @param   array 	    data
+	 * @param   string 	    data['name']      誰離開了？
+	 */
+	public function buybuy($param)
+	{
+
 	}
 }
