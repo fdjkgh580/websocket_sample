@@ -376,9 +376,84 @@ class Room
 
 	}
 
-	// public function name($room_id, $chatroom_name = "chatroom")
-	// {
-	// 	$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
 
-	// }
+	public function get_message($ws, $frame)
+	{
+		list($obj, $chatroom_name) = $this->decode_user_data($frame->data);
+
+		if ($obj->type == "join") 
+		{
+			// 若建立群組
+			if ( ! $this->is_exits($chatroom_name)) 
+			{
+				echo "建立群組 $chatroom_name \n";
+
+				$this->create(
+				[
+					'chatroom_name' => $chatroom_name,
+					'room_id'       => $obj->room_id,
+				]);
+			}
+
+			// 若群組沒有人
+			if ($this->is_no_one($chatroom_name))
+			{
+				echo "群組 $chatroom_name 加入第一個使用者 $frame->fd \n";
+
+				// 加入第一個使用者
+				$this->first_user(
+				[
+					'chatroom_name' => $chatroom_name,
+					'room_id'       => $obj->room_id,
+					'user_id'       => $frame->fd
+				]);
+
+				// 記錄使用者
+				$this->user_insert(
+				[
+					'user_key' => $frame->fd,
+					'user_val' => 
+					[
+						'name' => $obj->name
+					]
+				]);
+			}
+			else 
+			{
+				echo "群組 $chatroom_name 追加使用者 $frame->fd \n";
+
+				// 追加使用者
+				$this->add_user(
+				[
+					'chatroom_name' => $chatroom_name,
+					'room_id'       => $obj->room_id,
+					'user_id'       => $frame->fd
+				]);
+			}
+
+			// 提醒使用者
+			$this->welcome(
+			[
+				'chatroom_name' => $chatroom_name,
+				'ws' => $ws,
+				'self' => $frame->fd,
+				'data' => [
+					'type' => 'into',
+					'name' => $obj->name
+				]
+			]);
+
+		}
+		elseif ($obj->type == "message")
+		{
+			// 發送給場內的所有使用者
+			$this->push_message(
+			[
+				'chatroom_name' => $chatroom_name,
+				'ws'            => $ws,
+				'self'          => $frame->fd,
+				'data'          => $frame->data
+			]);
+		}
+	}
 }

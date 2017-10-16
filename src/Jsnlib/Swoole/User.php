@@ -26,6 +26,10 @@ class User
 		return true;
 	}
 
+	/**
+	 * 取得使用者
+	 * @param  int $user_id 使用者編號
+	 */
 	public function get($user_id)
 	{
 		return $this->box[$user_id];
