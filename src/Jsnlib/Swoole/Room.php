@@ -407,16 +407,6 @@ class Room
 					'room_id'       => $obj->room_id,
 					'user_id'       => $frame->fd
 				]);
-
-				// 記錄使用者
-				$this->user_insert(
-				[
-					'user_key' => $frame->fd,
-					'user_val' => 
-					[
-						'name' => $obj->name
-					]
-				]);
 			}
 			else 
 			{
@@ -430,6 +420,16 @@ class Room
 					'user_id'       => $frame->fd
 				]);
 			}
+
+			// 記錄使用者
+			$this->user_insert(
+			[
+				'user_key' => $frame->fd,
+				'user_val' => 
+				[
+					'name' => $obj->name
+				]
+			]);
 
 			// 提醒使用者
 			$this->welcome(

@@ -23,6 +23,7 @@ class User
 	public function insert($user_id, array $data = []): bool
 	{
 		$this->box[$user_id] = $data;
+
 		return true;
 	}
 
