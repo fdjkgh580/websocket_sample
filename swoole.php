@@ -119,24 +119,25 @@ $ws->on('close', function ($ws, $fd) {
 	// 取得使用者資料/名稱
 	$userdata = $room->user_get($fd);
 	
-	echo "Leave -------- \n\n";
-	print_r($userdata['name']);
-	echo "\n";
-	echo "Leave -------- \n\n";
+	// echo "Leave -------- \n\n";
+	// print_r($userdata['name']);
+	// echo "\n";
+	// echo "Leave -------- \n\n";
 
 	
 
-	// // 訊息通知該聊天室的所有人
-	// $room->buybuy(
-	// [
-	// 	'chatroom_name' => '',
-	// 	'ws' => $ws,
-	// 	'self' => $fd,
-	// 	'data' => 
-	// 	[
-	// 		'name' => $userdata['name']
-	// 	]
-	// ]);
+	// 訊息通知該聊天室的所有人
+	$room->buybuy(
+	[
+		'chatroom_name' => "chatroom_{$result['room_id']}",
+		'ws' => $ws,
+		'self' => $fd,
+		'data' => 
+		[
+			'type' => 'leave',
+			'name' => $userdata['name']
+		]
+	]);
 
 	// 離開聊天室
 	$room->leave($fd);

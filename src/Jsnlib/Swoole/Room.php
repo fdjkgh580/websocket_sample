@@ -323,6 +323,20 @@ class Room
 	 */
 	public function buybuy($param)
 	{
+		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
+
+	 	\Jsnlib\Swoole::push_target(
+	 	[
+			'ws'           => $param['ws'],
+			'target'       => $user_id_box,
+			'self'         => $param['self'],
+			'is_send_self' => false,
+			'data'         => json_encode($param['data'])
+	 	]);
+		// echo "Leave -------- \n\n";
+		// print_r($param);
+		// echo "\n";
+		// echo "Leave -------- \n\n";
 
 	}
 

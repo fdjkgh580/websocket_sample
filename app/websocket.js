@@ -32,12 +32,15 @@ $(function (){
 
             this.onmessage = function (e){
                 var obj = JSON.parse(e.data);
+
                 if (obj.type == "into") {
                     $.vmodel.get("chatHelper").welcome(obj);
                 } 
                 else if (obj.type == "message") {
-                    // console.log(obj)
                     $.vmodel.get("chatHelper").new_message(obj)
+                }
+                else if (obj.type == "leave") {
+                    $.vmodel.get("chatHelper").leave(obj)
                 }
                 else {
                     $.vmodel.get("chatHelper").debug('接收到的訊息無法分類');

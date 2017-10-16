@@ -36,6 +36,15 @@ $(function (){
 
                 $(".chat").append(li);
             }
+            this.leave = function (obj){
+                var username = $(".name").val();
+                var li = 
+                    '<li>' + 
+                        '<span>' + obj.name +'離開群組</span>' + 
+                    '</li>';
+
+                $(".chat").append(li);
+            }
             this.name_lcok = function (){
                 $(".name").prop("disabled", true);
             }
