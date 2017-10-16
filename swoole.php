@@ -106,35 +106,12 @@ $ws->on('message', function ($ws, $frame) {
 
 // 今天 WebSocket 連接關閉事件
 $ws->on('close', function ($ws, $fd) {
+	
 	echo "離開者編號：{$fd}\n";
 
 	$room =& $GLOBALS['room'];
 
-	// 使用者離開前在哪個聊天室
-	$result = $room->where($fd);
-	// $result['room_id'];
-	// $result['user_id'];
-	if ($result == false) throw new \Exception("發生錯誤");
-
-	// 取得使用者資料/名稱
-	$userdata = $room->user_get($fd);
-	
-
-	// 訊息通知該聊天室的所有人
-	$room->buybuy(
-	[
-		'chatroom_name' => "chatroom_{$result['room_id']}",
-		'ws' => $ws,
-		'self' => $fd,
-		'data' => 
-		[
-			'type' => 'leave',
-			'name' => $userdata['name']
-		]
-	]);
-
-	// 離開聊天室
-	$room->leave($fd);
+	$room->leave($ws, $fd);
 
 });
 

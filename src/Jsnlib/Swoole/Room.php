@@ -165,9 +165,46 @@ class Room
 	}
 
 	/**
-	 * 離開聊天室
+	 * 離開
+	 * @param  object $ws websocket
+	 * @param  int    $fd 使用者編號
 	 */
-	public function leave($fd)
+	public function leave($ws, $fd): bool
+	{
+		// 使用者離開前在哪個聊天室
+		$result = $this->where($fd);
+		// $result['room_id'];
+		// $result['user_id'];
+		if ($result == false) throw new \Exception("發生錯誤");
+
+		// 取得使用者資料/名稱
+		$userdata = $this->user_get($fd);
+		
+
+		// 訊息通知該聊天室的所有人
+		$this->buybuy(
+		[
+			'chatroom_name' => "chatroom_{$result['room_id']}",
+			'ws' => $ws,
+			'self' => $fd,
+			'data' => 
+			[
+				'type' => 'leave',
+				'name' => $userdata['name']
+			]
+		]);
+
+		// 離開聊天室
+		$this->remove_user($fd);
+
+		return true;
+	}
+
+
+	/**
+	 * 將使用者離開聊天室
+	 */
+	protected function remove_user($fd)
 	{
 		foreach($this->box as $chatroom_name)
 		{
@@ -190,7 +227,6 @@ class Room
 				'user_id' => $user_encode
 			]);
 
-			// $chatroom = $this->chatroom($chatroom_name);
 		}
 	}
 
