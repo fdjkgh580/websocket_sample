@@ -43,6 +43,8 @@ class Room
 	public function decode_user_data($json_data, $chatroom_name = "chatroom"): array
 	{
 		$obj = json_decode($json_data);
+		if (!isset($obj->room_id)) return [$obj, false];
+
 		$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
 		return [$obj, $chatroom_name];
 	}
@@ -178,6 +180,10 @@ class Room
 	{
 		// 使用者離開前在哪個聊天室
 		$result = $this->where($fd);
+		if ($result === false)
+		{
+			return true;
+		}
 		// $result['room_id'];
 		// $result['user_id'];
 		if ($result == false) throw new \Exception("發生錯誤");
@@ -217,7 +223,7 @@ class Room
 		{
 			$fd = $this->temp;
 			unset($this->temp);
-			
+
 			list($chatroom, $user_id_box) = $this->userlist($chatroom_name);
 
 			// 若在陣列中就刪除
@@ -284,7 +290,7 @@ class Room
 	 * @param   fd
 	 * @return  [int room_id, array user_id]
 	 */
-	public function where($fd): array
+	public function where($fd)
 	{
 		foreach ($this->map() as $key => $chatroom)
 		{
@@ -390,6 +396,15 @@ class Room
 	public function get_message($ws, $frame)
 	{
 		list($obj, $chatroom_name) = $this->decode_user_data($frame->data);
+
+		// 若沒有房間編號，代表一般文字訊息輸出
+		if (empty($chatroom_name))
+		{
+			print_r($obj);
+			return true;
+		}
+
+
 
 		if ($obj->type == "join") 
 		{
