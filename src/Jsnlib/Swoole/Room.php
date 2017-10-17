@@ -21,12 +21,16 @@ class Room
 	 * @param   $type          table | array
 	 * @param   $param['size'] 需要是 2 的次方
 	 */
-	public function use($type, $param)
+	public function use($type, $param = [])
 	{
 		if ($type == "table")
 		{
 			$this->storage = new \Jsnlib\Swoole\Storage\Table(['size' => $param['size']]);
 		} 
+		elseif ($type == "array")
+		{
+			$this->storage = new \Jsnlib\Swoole\Storage\PHPArray;
+		}
 
 	}
 
@@ -207,8 +211,13 @@ class Room
 	 */
 	protected function remove_user($fd)
 	{
-		foreach($this->box as $chatroom_name)
+		$this->temp = $fd;
+
+		$this->each(function ($key, $chatroom_name)
 		{
+			$fd = $this->temp;
+			unset($this->temp);
+			
 			list($chatroom, $user_id_box) = $this->userlist($chatroom_name);
 
 			// 若在陣列中就刪除
@@ -227,8 +236,8 @@ class Room
 				'room_id' => $chatroom['room_id'],
 				'user_id' => $user_encode
 			]);
-
-		}
+		
+		});
 	}
 
 	/**
