@@ -5,7 +5,7 @@ require_once 'vendor/autoload.php';
 $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
 $GLOBALS['room'] = new \Jsnlib\Swoole\Room;
-$GLOBALS['table'] = $GLOBALS['room']->start(1024);
+$GLOBALS['room']->start(1024);
 
 // 3.1 所有的聊天室名稱
 // $tablebox = [];
