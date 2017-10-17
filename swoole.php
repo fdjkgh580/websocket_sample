@@ -5,10 +5,13 @@ require_once 'vendor/autoload.php';
 $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
 $GLOBALS['room'] = new \Jsnlib\Swoole\Room;
-$GLOBALS['room']->start(1024);
 
-// 3.1 所有的聊天室名稱
-// $tablebox = [];
+//使用的儲存槽
+$GLOBALS['room']->use('table', 
+[
+	'size' => 1024
+]);
+
 
 // 4. 監聽 WebSocket 連接打開事件
 $ws->on('open', function ($ws, $request) {
@@ -31,11 +34,11 @@ $ws->on('message', function ($ws, $frame) {
 // 今天 WebSocket 連接關閉事件
 $ws->on('close', function ($ws, $fd) {
 
-	echo "離開者編號：{$fd}\n";
+	// echo "離開者編號：{$fd}\n";
 
-	$room =& $GLOBALS['room'];
+	// $room =& $GLOBALS['room'];
 
-	$room->leave($ws, $fd);
+	// $room->leave($ws, $fd);
 
 });
 

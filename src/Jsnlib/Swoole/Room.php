@@ -3,8 +3,8 @@ namespace Jsnlib\Swoole;
 
 class Room 
 {
-	// swoole_table() 存放
-	protected $table;
+	// 資料儲存槽
+	protected $storage;
 
 	// 所有的聊天室名稱
 	protected $box = [];
@@ -18,18 +18,16 @@ class Room
 
 	/**
 	 * 開始，會建立表格的大小
-	 * @param   $size 需要是 2 的次方
+	 * @param   $type          table | array
+	 * @param   $param['size'] 需要是 2 的次方
 	 */
-	public function start($size = 1024)
+	public function use($type, $param)
 	{
-		$this->table = new \swoole_table($size);
+		if ($type == "table")
+		{
+			$this->storage = new \Jsnlib\Swoole\Storage\Table(['size' => $param['size']]);
+		} 
 
-		// 建立欄位
-		$this->table->column('room_id', \swoole_table::TYPE_INT);
-		$this->table->column('user_id', \swoole_table::TYPE_STRING, 256);
-		$this->table->create();
-
-		return $this->table;
 	}
 
 	/**
@@ -51,7 +49,7 @@ class Room
 	 */
 	public function is_exits($chatroom_name): bool
 	{
-		return $this->table->exist($chatroom_name);
+		return $this->storage->exist($chatroom_name);
 	}
 
 
@@ -76,7 +74,7 @@ class Room
 	{
 		$user_id_encode = json_encode([$param['user_id']]);
 
-		$this->table->set($param['chatroom_name'], 
+		$this->storage->set($param['chatroom_name'], 
 		[
 			'room_id' => $param['room_id'],
 			'user_id' => $user_id_encode
@@ -99,7 +97,7 @@ class Room
 		// 編碼為 json
 		$user_id_encode = json_encode($user_id_box);
 
-		$this->table->set($param['chatroom_name'], 
+		$this->storage->set($param['chatroom_name'], 
 		[
 			'room_id' => $param['room_id'],
 			'user_id' => $user_id_encode
@@ -116,7 +114,7 @@ class Room
 	{
 		$this->box[] = $param['chatroom_name'];
 		
-		$this->table->set($param['chatroom_name'], 
+		$this->storage->set($param['chatroom_name'], 
 		[
 			'room_id' => $param['room_id'],
 		]);
@@ -224,7 +222,7 @@ class Room
 
 			// 重新編碼為 json 後寫入
 			$user_encode = json_encode($user_id_box);
-			$this->table->set($chatroom_name, 
+			$this->storage->set($chatroom_name, 
 			[
 				'room_id' => $chatroom['room_id'],
 				'user_id' => $user_encode
@@ -256,13 +254,13 @@ class Room
 	 */
 	public function chatroom($chatroom_name = false): array
 	{
-		if ($chatroom_name !== false) return $this->table->get($chatroom_name);
+		if ($chatroom_name !== false) return $this->storage->get($chatroom_name);
 
 		$this->collection = [];
 
 		$this->each(function ($key, $chatroom_name)
 		{
-			$this->collection[] = $this->table->get($box_chatroom_name);
+			$this->collection[] = $this->storage->get($box_chatroom_name);
 		});
 
 		$c = $this->collection;
@@ -308,7 +306,7 @@ class Room
 
 		$this->each(function ($key, $chatroom_name)
 		{
-			$result = $this->table->get($chatroom_name);
+			$result = $this->storage->get($chatroom_name);
 
 			$this->temp[] = 
 			[
