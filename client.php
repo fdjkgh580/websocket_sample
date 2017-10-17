@@ -1,10 +1,24 @@
 <?php
+
 $cli = new swoole_http_client('52.221.147.32', 8080);
 
+$cli->on('connect', function () {
+	echo "連接成功 \n";
+});
+
+$cli->on('close', function (){
+	echo "連接關閉 \n";
+});
+
 $cli->on('message', function ($_cli, $frame) {
-    var_dump($frame);
+	echo "收到訊息 \n";
+    var_dump($frame->data);
+
+    // 關閉連接
+    $_cli->close();
 });
 
 $cli->upgrade('/', function ($cli) {
-    $cli->push("hello world");
+	echo "使用 WebSocket 發送 \n";
+    $cli->push(json_encode(['say' => 'hello']));
 });

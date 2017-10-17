@@ -397,13 +397,20 @@ class Room
 	{
 		list($obj, $chatroom_name) = $this->decode_user_data($frame->data);
 
-		// 若沒有房間編號，代表一般文字訊息輸出
+		// 若沒有房間編號，代表一般文字訊息，那發送給所有使用者
 		if (empty($chatroom_name))
 		{
-			print_r($obj);
+			// 發送給場內的所有使用者
+		 	\Jsnlib\Swoole::push_all(
+			[
+				'ws'           => $ws,
+				'self'         => $frame->fd,
+				'is_send_self' => true,
+				'data'         => $frame->data
+		 	]);
+
 			return true;
 		}
-
 
 
 		if ($obj->type == "join") 
