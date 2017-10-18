@@ -3,6 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Websocket extends CI_Controller {
 
+	function __construct()
+	{
+		parent::__construct();
+		$this->chat_model = new \Model\Chat;
+	}
+
 	public function run()
 	{
 
@@ -25,6 +31,17 @@ class Websocket extends CI_Controller {
 			$room =& $GLOBALS['room'];
 			$room->get_message($ws, $frame);
 
+			$data_decode = json_decode($frame->data, true);
+			$message = isset($data_decode['message']) ? $data_decode['message'] : null;
+			
+			// 寫入DB
+			$last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
+			[
+			    'chat_room_id' => $data_decode['room_id'],
+			    'chat_message' => $message,
+			    'chat_connect_id' => $frame->fd,
+			    'chat_option' => $frame->data
+			]));
 		});
 
 		$ws->on('close', function ($ws, $fd) {
@@ -33,11 +50,32 @@ class Websocket extends CI_Controller {
 
 			$room =& $GLOBALS['room'];
 
-			$room->leave($ws, $fd);
+			$result = $room->leave($ws, $fd);
+
+			// 寫入DB
+			$last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
+			[
+			    'chat_room_id' => $result['room_id'],
+			    'chat_message' => null,
+			    'chat_connect_id' => $result['user_id'],
+			    'chat_option' => json_encode([
+			    	'type' => 'leave',
+			    	'name' => $result['userdata']['name']
+			    ])
+			]));
 
 		});
 
 		$ws->start();
 
+	}
+
+
+	// 測試寫入 DB
+	public function db()
+	{
+		echo "TEST DB \n\n\n";
+
+		
 	}
 }

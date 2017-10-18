@@ -179,8 +179,9 @@ class Room
 	 * 離開
 	 * @param  object $ws websocket
 	 * @param  int    $fd 使用者編號
+	 * @return array  [room_id, user_id, userdata]
 	 */
-	public function leave($ws, $fd): bool
+	public function leave($ws, $fd): array
 	{
 		// 使用者離開前在哪個聊天室
 		$result = $this->where($fd);
@@ -212,7 +213,12 @@ class Room
 		// 離開聊天室
 		$this->remove_user($fd);
 
-		return true;
+		return 
+		[
+			'room_id' => $result['room_id'],
+			'user_id' => $fd, 
+			'userdata' => $userdata
+		];
 	}
 
 
