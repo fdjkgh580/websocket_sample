@@ -1,5 +1,37 @@
 <?php 
 
+class My
+{
+	
+	protected $box;
+
+	function get()
+	{
+		$this->box = 123;
+		$this->each(function ()
+		{
+			print_r($this);
+		});
+	}
+
+	public function each(callable $callback)
+	{
+		$callback();
+	}
+
+}
+
+$my = new My;
+$my->get();
+
+
+
+
+
+
+die;
+
+
 // 房間編號
 $room_id = new stdClass;
 $room_id->a = 'A';

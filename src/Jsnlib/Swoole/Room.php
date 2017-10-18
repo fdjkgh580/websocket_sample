@@ -9,7 +9,11 @@ class Room
 	// 所有的聊天室名稱
 	protected $box = [];
 
+	// 使用者物件，用來記錄使用者的類別
 	protected $uobj;
+
+	// 暫存變數
+	protected $temp;
 
 	function __construct()
 	{
@@ -93,7 +97,7 @@ class Room
 	 * @param   room_id
 	 * @param   user_id
 	 */
-	public function add_user($param)
+	public function append_user($param)
 	{
 		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
 
@@ -219,10 +223,10 @@ class Room
 	{
 		$this->temp = $fd;
 
+
 		$this->each(function ($key, $chatroom_name)
 		{
 			$fd = $this->temp;
-			unset($this->temp);
 
 			list($chatroom, $user_id_box) = $this->userlist($chatroom_name);
 
@@ -244,6 +248,8 @@ class Room
 			]);
 		
 		});
+
+		unset($this->temp);
 	}
 
 	/**
@@ -393,6 +399,36 @@ class Room
 	}
 
 
+	public function add_user($chatroom_name, $room_id, $user_id)
+	{
+		// 若群組沒有人
+		if ($this->is_no_one($chatroom_name))
+		{
+			echo "群組 $chatroom_name 加入第一個使用者 $user_id \n";
+
+			// 加入第一個使用者
+			$this->first_user(
+			[
+				'chatroom_name' => $chatroom_name,
+				'room_id'       => $room_id,
+				'user_id'       => $user_id
+			]);
+		}
+		else 
+		{
+			echo "群組 $chatroom_name 追加使用者 $user_id \n";
+
+			// 追加使用者
+			$this->append_user(
+			[
+				'chatroom_name' => $chatroom_name,
+				'room_id'       => $room_id,
+				'user_id'       => $user_id
+			]);
+		}
+	}
+
+
 	public function get_message($ws, $frame)
 	{
 		list($obj, $chatroom_name) = $this->decode_user_data($frame->data);
@@ -427,31 +463,8 @@ class Room
 				]);
 			}
 
-			// 若群組沒有人
-			if ($this->is_no_one($chatroom_name))
-			{
-				echo "群組 $chatroom_name 加入第一個使用者 $frame->fd \n";
-
-				// 加入第一個使用者
-				$this->first_user(
-				[
-					'chatroom_name' => $chatroom_name,
-					'room_id'       => $obj->room_id,
-					'user_id'       => $frame->fd
-				]);
-			}
-			else 
-			{
-				echo "群組 $chatroom_name 追加使用者 $frame->fd \n";
-
-				// 追加使用者
-				$this->add_user(
-				[
-					'chatroom_name' => $chatroom_name,
-					'room_id'       => $obj->room_id,
-					'user_id'       => $frame->fd
-				]);
-			}
+			// 將使用者加入群組
+			$this->add_user($chatroom_name, $obj->room_id, $frame->fd);
 
 			// 記錄使用者
 			$this->user_insert(
