@@ -9,6 +9,8 @@
     },
     "require": {
         "cboden/ratchet": "0.3.*",
-        "jsnlib/swoole": "^1.0"
+        "jsnlib/swoole": "^1.0",
+        "jsnlib/translg": ">=1.0.1",
+        "jsnlib/jsnlib": ">=2.1.0",
     }
 }
