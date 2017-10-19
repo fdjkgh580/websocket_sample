@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Ratchet Test</title>
+	<base href="<?=site_url();?>">
 	<meta charset="UTF-8"/>
 	<link rel="stylesheet" href="app.css">
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -10,7 +11,7 @@
 </head>
 <body>
 
-	<form class="form1" method="post" action="room.php">
+	<form class="form1" method="post" action="client/room">
 		
 
 		<p>

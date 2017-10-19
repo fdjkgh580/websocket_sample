@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1baa09ab34c4218afca59047163c4556",
+    "content-hash": "7f6dcc5a0c782e789c6ca0e96d1d37da",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -305,6 +305,59 @@
             "time": "2014-05-01T21:36:02+00:00"
         },
         {
+            "name": "jsnlib/jsnlib",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fdjkgh580/jsnlib.git",
+                "reference": "839a7acad4a9ff7627fa66623549815e84eb11bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fdjkgh580/jsnlib/zipball/839a7acad4a9ff7627fa66623549815e84eb11bf",
+                "reference": "839a7acad4a9ff7627fa66623549815e84eb11bf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "Ao",
+                    "Cart",
+                    "Copy",
+                    "Del",
+                    "Db",
+                    "Edit",
+                    "Export",
+                    "Filelink",
+                    "Group",
+                    "Hash",
+                    "Pdo",
+                    "Popcount",
+                    "Rand",
+                    "Seq",
+                    "Taiwan",
+                    "Upload",
+                    "UploadImageBase64"
+                ],
+                "files": [
+                    "Function.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "類別庫",
+            "homepage": "https://github.com/fdjkgh580/jsnlib",
+            "keywords": [
+                "library"
+            ],
+            "time": "2017-08-02T07:10:45+00:00"
+        },
+        {
             "name": "jsnlib/swoole",
             "version": "1.1.0",
             "source": {
@@ -330,6 +383,44 @@
             ],
             "description": "輔助 Swoole 的工具",
             "time": "2017-10-12T09:05:25+00:00"
+        },
+        {
+            "name": "jsnlib/translg",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fdjkgh580/translg.git",
+                "reference": "94e8651980af90fb1602ca80f1a607554e33beaf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fdjkgh580/translg/zipball/94e8651980af90fb1602ca80f1a607554e33beaf",
+                "reference": "94e8651980af90fb1602ca80f1a607554e33beaf",
+                "shasum": ""
+            },
+            "require": {
+                "jsnlib/jsnlib": ">=2.0.0",
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "Translg"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Codeigniter 簡單轉換多國語言",
+            "homepage": "https://github.com/fdjkgh580/translg",
+            "keywords": [
+                "codeigniter",
+                "jsnlib",
+                "language",
+                "library"
+            ],
+            "time": "2017-04-21T02:15:29+00:00"
         },
         {
             "name": "react/event-loop",
@@ -623,16 +714,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803"
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
                 "shasum": ""
             },
             "require": {
@@ -644,7 +735,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5-dev"
+                    "dev-master": "1.6-dev"
                 }
             },
             "autoload": {
@@ -678,7 +769,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-06-14T15:44:48+00:00"
+            "time": "2017-10-11T12:05:26+00:00"
         },
         {
             "name": "symfony/routing",
@@ -765,6 +856,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=7.1"
+    },
     "platform-dev": []
 }

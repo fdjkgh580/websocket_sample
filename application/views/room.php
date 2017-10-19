@@ -3,6 +3,7 @@
 <head>
 	<title>Ratchet Test</title>
 	<meta charset="UTF-8"/>
+	<base href="<?=site_url();?>">
 	<link rel="stylesheet" href="app.css?t=<?=time()?>">
 	<script
 	  src="https://code.jquery.com/jquery-3.2.1.min.js"
