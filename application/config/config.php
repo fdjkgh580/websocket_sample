@@ -24,10 +24,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // 允許多筆通過的網域
-$allowed_domains = ['localhost', 'chat.websocket.dennings.org/framework']; 
+$allowed_domains = ['localhost', 'chat.websocket.dennings.org']; 
  
 // 當偵測到非上述的例外狀況，會被導向到的網域
-$default_domain  = 'chat.websocket.dennings.org/framework';
+$default_domain  = 'chat.websocket.dennings.org';
  
 if (in_array($_SERVER['HTTP_HOST'], $allowed_domains, TRUE))
 {

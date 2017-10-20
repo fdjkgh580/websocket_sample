@@ -9,14 +9,22 @@ class Websocket extends CI_Controller {
 		$this->chat_model = new \Model\Chat;
 	}
 
+
+	// 執行服務
 	public function run()
 	{
 
 		$ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
+		$ws->set([
+		    'worker_num' => 4,    //worker process num
+		    'backlog' => 128,   //listen backlog
+		]);
+
+
 		$GLOBALS['room'] = new \Lib\Jsnlib\Swoole\Room;
 
-		$GLOBALS['room']->use('array');
+		$GLOBALS['room']->use('table');
 
 		$ws->on('open', function ($ws, $request) {
 			
@@ -33,6 +41,8 @@ class Websocket extends CI_Controller {
 
 			$data_decode = json_decode($frame->data, true);
 			$message = isset($data_decode['message']) ? $data_decode['message'] : null;
+
+			if (!isset($data_decode['room_id'])) return true;
 			
 			// 寫入DB
 			$last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
@@ -51,6 +61,8 @@ class Websocket extends CI_Controller {
 			$room =& $GLOBALS['room'];
 
 			$result = $room->leave($ws, $fd);
+
+			if ($result === false) return true;
 
 			// 寫入DB
 			$last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
@@ -75,7 +87,35 @@ class Websocket extends CI_Controller {
 	public function db()
 	{
 		echo "TEST DB \n\n\n";
+	}
 
-		
+	public function test()
+	{
+		$ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
+
+		$this->storage = new \Lib\Jsnlib\Swoole\Storage\PHPArray;
+
+		$ws->on('open', function ($ws, $request) {
+			
+		});
+
+		$ws->on('message', function ($ws, $frame) {
+
+			$obj = json_decode($frame->data);
+
+			// 建立房間
+			if ( ! $this->storage->exist($obj->room_id))
+			{
+				$this->storage->set($obj->room_id, json_encode([null]));
+			}
+
+			print_r($this->storage->get()); echo "\n";
+
+		});
+
+		$ws->on('close', function ($ws, $fd) {
+		});
+
+		$ws->start();
 	}
 }

@@ -21,8 +21,9 @@ class PHPArray
 		$this->box[$key] = $val;
 	}
 
-	public function get($key)
+	public function get($key = false)
 	{
+		if ($key === false) return $this->box;
 		return $this->box[$key];
 	}
 }

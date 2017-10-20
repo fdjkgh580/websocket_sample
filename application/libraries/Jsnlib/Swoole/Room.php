@@ -179,19 +179,19 @@ class Room
 	 * 離開
 	 * @param  object $ws websocket
 	 * @param  int    $fd 使用者編號
-	 * @return array  [room_id, user_id, userdata]
+	 * @return array  false/[room_id, user_id, userdata]
 	 */
-	public function leave($ws, $fd): array
+	public function leave($ws, $fd)
 	{
 		// 使用者離開前在哪個聊天室
 		$result = $this->where($fd);
+
 		if ($result === false)
 		{
-			return true;
+			return false;
 		}
 		// $result['room_id'];
 		// $result['user_id'];
-		if ($result == false) throw new \Exception("發生錯誤");
 
 		// 取得使用者資料/名稱
 		$userdata = $this->user_get($fd);
@@ -300,7 +300,7 @@ class Room
 	/**
 	 * 搜尋使用者在哪個聊天室
 	 * @param   fd
-	 * @return  [int room_id, array user_id]
+	 * @return  false/[int room_id, array user_id]
 	 */
 	public function where($fd)
 	{
