@@ -28,13 +28,13 @@ class Websocket extends CI_Controller {
 
 		$ws->on('open', function ($ws, $request) {
 			
-			echo "進入者編號：{$request->fd}\n";
+			// echo "進入者編號：{$request->fd}\n";
 
 		});
 
 		$ws->on('message', function ($ws, $frame) {
 
-			echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
+			// echo "收到進入者 {$frame->fd} 訊息: {$frame->data} \n";
 
 			$room =& $GLOBALS['room'];
 			$room->get_message($ws, $frame);
@@ -56,7 +56,7 @@ class Websocket extends CI_Controller {
 
 		$ws->on('close', function ($ws, $fd) {
 
-			echo "離開者編號：{$fd}\n";
+			// echo "離開者編號：{$fd}\n";
 
 			$room =& $GLOBALS['room'];
 
