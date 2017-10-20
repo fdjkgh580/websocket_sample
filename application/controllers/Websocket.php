@@ -106,10 +106,29 @@ class Websocket extends CI_Controller {
 			// 建立房間
 			if ( ! $this->storage->exist($obj->room_id))
 			{
+				// echo "建立房間\n";
 				$this->storage->set($obj->room_id, json_encode([null]));
-			}
 
-			print_r($this->storage->get()); echo "\n";
+				echo "加入第一人\n";
+				$this->storage->set($obj->room_id, json_encode([$frame->fd]));
+			}
+			else 
+			{
+				echo "追加 \n";
+
+				// 目前的值
+				$encode = $this->storage->get($obj->room_id);
+				$decode = json_decode($encode, true);
+
+				// 添加
+				array_push($decode, $frame->fd);
+				$encode = json_encode($decode);
+				$this->storage->set($obj->room_id, $encode);
+
+				
+				// print_r($decode); echo "\n";
+
+			}
 
 		});
 
