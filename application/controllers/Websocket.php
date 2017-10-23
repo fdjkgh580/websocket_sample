@@ -22,66 +22,75 @@ class Websocket extends CI_Controller {
 
         $ws->set([
             'worker_num' => 1,    //worker process num
-            'backlog' => 128,   //listen backlog
+            // 'backlog' => 128,   //listen backlog
         ]);
 
 
         $this->room->debug($this->is_print_command_line);
 
         $ws->on('open', function ($ws, $request) {
-
-            $this->command_line("■ 進入者編號：{$request->fd}\n");
-
+            $this->on_open($ws, $request);
         });
 
         $ws->on('message', function ($ws, $frame) {
-
-            $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
-
-            $this->room->get_message_and_send($ws, $frame);
-
-            $data_decode = json_decode($frame->data, true);
-            $message = isset($data_decode['message']) ? $data_decode['message'] : null;
-
-            if (!isset($data_decode['room_id'])) return true;
-            
-            // 寫入DB
-            $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
-            [
-                'chat_room_id' => $data_decode['room_id'],
-                'chat_message' => $message,
-                'chat_connect_id' => $frame->fd,
-                'chat_option' => $frame->data
-            ]));
+            $this->on_message($ws, $frame);
         });
 
         $ws->on('close', function ($ws, $fd) {
-
-            $this->command_line("離開者編號：{$fd} ----------- END\n\n");
-
-            $this->room =& $GLOBALS['room'];
-
-            $result = $this->room->leave($ws, $fd);
-
-            if ($result === false) return true;
-
-            // 寫入DB
-            $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
-            [
-                'chat_room_id' => $result['room_id'],
-                'chat_message' => null,
-                'chat_connect_id' => $result['user_id'],
-                'chat_option' => json_encode([
-                    'type' => 'leave',
-                    'name' => $result['userdata']['name']
-                ])
-            ]));
-
+            $this->on_close($ws, $fd);
         });
 
         $ws->start();
 
     }
+
+    public function on_open($ws, $request)
+    {
+        $this->command_line("■ 進入者編號：{$request->fd}\n");
+    }
+
+    public function on_message($ws, $frame)
+    {
+        $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
+
+        $this->room->get_message_and_send($ws, $frame);
+
+        $data_decode = json_decode($frame->data, true);
+        $message = isset($data_decode['message']) ? $data_decode['message'] : null;
+
+        if (!isset($data_decode['room_id'])) return true;
+        
+        // 寫入DB
+        $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
+        [
+            'chat_room_id' => $data_decode['room_id'],
+            'chat_message' => $message,
+            'chat_connect_id' => $frame->fd,
+            'chat_option' => $frame->data
+        ]));
+    }
+
+    public function on_error($ws, $fd)
+    {
+        $this->command_line("離開者編號：{$fd} ----------- END\n\n");
+
+        $result = $this->room->leave($ws, $fd);
+
+        if ($result === false) return true;
+
+        // 寫入DB
+        $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
+        [
+            'chat_room_id' => $result['room_id'],
+            'chat_message' => null,
+            'chat_connect_id' => $result['user_id'],
+            'chat_option' => json_encode([
+                'type' => 'leave',
+                'name' => $result['userdata']['name']
+            ])
+        ]));
+    }
+
 
 
     public function test()

@@ -21,6 +21,7 @@ class Table
 		$this->table->column('room_id', \swoole_table::TYPE_INT);
 		$this->table->column('user_id', \swoole_table::TYPE_STRING, 256);
 		$this->table->create();
+		// print_r($this->table);die;
 	}
 
 	public function exist($key)

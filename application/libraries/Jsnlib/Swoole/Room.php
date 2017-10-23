@@ -23,7 +23,7 @@ class Room
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
-		$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 2048]);
+		$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 1024 * 200]);
 		$this->connect = new \Lib\Jsnlib\Swoole\Storage\Connect;
 		$this->debug(false);
 	}
