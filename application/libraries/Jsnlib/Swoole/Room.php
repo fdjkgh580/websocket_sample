@@ -8,6 +8,9 @@ class Room
 	// 資料儲存槽
 	protected $storage;
 
+	// 連線儲存體
+	protected $connect;
+
 	// 所有的聊天室名稱
 	protected $box = [];
 
@@ -20,7 +23,7 @@ class Room
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
-
+		$this->connect = new \Lib\Jsnlib\Swoole\Storage\Connect;
 		$this->debug(false);
 	}
 
@@ -46,6 +49,19 @@ class Room
 		}
 
 	}
+
+	/**
+	 * 可在不同線程中，紀錄連接的編號
+	 */
+	public function connect($action, $connect_id = false)
+	{
+		if ($action == "add")
+			return $this->connect->add($connect_id);
+
+		elseif ($action == "get")
+			return $this->connect->get();
+	}
+
 
 	/**
 	 * 解碼使用者的數據

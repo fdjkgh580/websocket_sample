@@ -2,6 +2,7 @@
 namespace Lib\Jsnlib\Swoole\Storage;
 /**
  * 使用 swoole_table 作為儲存體
+ * 不使用 PHP Array 作為儲存，是因為當多線程的時候，彼此無法互通
  */
 class Table 
 {
@@ -16,11 +17,10 @@ class Table
 
 		$this->table = new \swoole_table($param['size']);
 
-		// 建立欄位
+		// table
 		$this->table->column('room_id', \swoole_table::TYPE_INT);
 		$this->table->column('user_id', \swoole_table::TYPE_STRING, 256);
 		$this->table->create();
-
 	}
 
 	public function exist($key)
@@ -37,4 +37,5 @@ class Table
 	{
 		return $this->table->get($key);
 	}
+
 }
