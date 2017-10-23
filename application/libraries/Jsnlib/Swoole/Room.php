@@ -3,6 +3,8 @@ namespace Lib\Jsnlib\Swoole;
 
 class Room 
 {
+	use Debug;
+
 	// 資料儲存槽
 	protected $storage;
 
@@ -18,6 +20,13 @@ class Room
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
+
+		$this->debug(false);
+	}
+
+	public function debug($bool = false)
+	{
+		$this->is_print_command_line = $bool;
 	}
 
 	/**
@@ -143,6 +152,9 @@ class Room
 	{
 		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
 
+		$mix_user = implode(",", $user_id_box);
+		$this->command_line("使用者 {$param['self']} 發送歡迎訊息到成員 {$mix_user} \n");
+
 	 	\Jsnlib\Swoole::push_target(
 	 	[
 			'ws'           => $param['ws'],
@@ -165,7 +177,7 @@ class Room
 		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
 
 		$mix_user = implode(",", $user_id_box);
-		echo "發送訊息到聊天室內所有的成員 {$mix_user} \n";
+		$this->command_line("發送訊息到聊天室內所有的成員 {$mix_user} \n");
 
 	 	\Jsnlib\Swoole::push_target(
 		[
@@ -412,7 +424,7 @@ class Room
 		// 若群組沒有人
 		if ($this->is_no_one($chatroom_name))
 		{
-			echo "群組 $chatroom_name 加入第一個使用者 $user_id \n";
+			$this->command_line("群組 $chatroom_name 加入第一個使用者 $user_id \n");
 
 			// 加入第一個使用者
 			$this->first_user(
@@ -424,7 +436,7 @@ class Room
 		}
 		else 
 		{
-			echo "群組 $chatroom_name 追加使用者 $user_id \n";
+			$this->command_line("群組 $chatroom_name 追加使用者 $user_id \n");
 
 			// 追加使用者
 			$this->append_user(
@@ -437,7 +449,7 @@ class Room
 	}
 
 
-	public function get_message($ws, $frame)
+	public function get_message_and_send($ws, $frame)
 	{
 		list($obj, $chatroom_name) = $this->decode_user_data($frame->data);
 
@@ -457,12 +469,15 @@ class Room
 		}
 
 
+		if (!isset($obj->type)) $this->command_line("須要參數 type \n");
+		if (!isset($obj->room_id)) $this->command_line("須要參數 room_id \n");
+
 		if ($obj->type == "join") 
 		{
 			// 若建立群組
 			if ( ! $this->is_exits($chatroom_name)) 
 			{
-				echo "建立群組 $chatroom_name \n";
+				$this->command_line("建立群組 $chatroom_name \n");
 
 				$this->create(
 				[
@@ -470,6 +485,9 @@ class Room
 					'room_id'       => $obj->room_id,
 				]);
 			}
+
+			
+			if (!isset($obj->name)) $this->command_line("須要參數 name \n");
 
 			// 將使用者加入群組
 			$this->add_user($chatroom_name, $obj->room_id, $frame->fd);

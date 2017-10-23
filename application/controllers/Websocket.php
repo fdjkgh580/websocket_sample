@@ -3,23 +3,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Websocket extends CI_Controller {
 
+    use \Lib\Jsnlib\Swoole\Debug;
+
     function __construct()
     {
         parent::__construct();
         $this->chat_model = new \Model\Chat;
-        $this->is_print_command_line = true;
+        $this->room = new \Lib\Jsnlib\Swoole\Room;
     }
-
-    public function command_line($msg)
-    {
-        if ($this->is_print_command_line === false) return false;
-        echo $msg;
-    }
-
 
     // 執行服務
     public function run()
     {
+        // Debug 
+        $this->is_print_command_line = true;
 
         $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
@@ -29,12 +26,12 @@ class Websocket extends CI_Controller {
         ]);
 
 
-        $GLOBALS['room'] = new \Lib\Jsnlib\Swoole\Room;
-
-        $GLOBALS['room']->use('array');
+        $this->room->use('array');
+        $this->room->debug($this->is_print_command_line);
 
         $ws->on('open', function ($ws, $request) {
 
+            
             $this->command_line("■ 進入者編號：{$request->fd}\n");
 
         });
@@ -43,8 +40,7 @@ class Websocket extends CI_Controller {
 
             $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
 
-            $room =& $GLOBALS['room'];
-            $room->get_message($ws, $frame);
+            $this->room->get_message_and_send($ws, $frame);
 
             $data_decode = json_decode($frame->data, true);
             $message = isset($data_decode['message']) ? $data_decode['message'] : null;
@@ -65,9 +61,9 @@ class Websocket extends CI_Controller {
 
             $this->command_line("離開者編號：{$fd} ----------- END\n\n");
 
-            $room =& $GLOBALS['room'];
+            $this->room =& $GLOBALS['room'];
 
-            $result = $room->leave($ws, $fd);
+            $result = $this->room->leave($ws, $fd);
 
             if ($result === false) return true;
 
