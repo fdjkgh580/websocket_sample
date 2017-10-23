@@ -70,7 +70,7 @@ class Websocket extends CI_Controller {
         ]));
     }
 
-    public function on_error($ws, $fd)
+    public function on_close($ws, $fd)
     {
         $this->command_line("離開者編號：{$fd} ----------- END\n\n");
 
