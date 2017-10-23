@@ -162,8 +162,10 @@ class Room
 	 */
 	public function push_message($param)
 	{
-
 		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
+
+		$mix_user = implode(",", $user_id_box);
+		echo "發送訊息到聊天室內所有的成員 {$mix_user} \n";
 
 	 	\Jsnlib\Swoole::push_target(
 		[
