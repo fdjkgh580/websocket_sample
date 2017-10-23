@@ -23,6 +23,7 @@ class Room
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
+		$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 2048]);
 		$this->connect = new \Lib\Jsnlib\Swoole\Storage\Connect;
 		$this->debug(false);
 	}
@@ -30,24 +31,6 @@ class Room
 	public function debug($bool = false)
 	{
 		$this->is_print_command_line = $bool;
-	}
-
-	/**
-	 * 開始，會建立表格的大小
-	 * @param   $type          table | array
-	 * @param   $param['size'] 需要是 2 的次方
-	 */
-	public function use($type, $param = [])
-	{
-		if ($type == "table")
-		{
-			$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => $param['size']]);
-		} 
-		elseif ($type == "array")
-		{
-			$this->storage = new \Lib\Jsnlib\Swoole\Storage\PHPArray;
-		}
-
 	}
 
 	/**

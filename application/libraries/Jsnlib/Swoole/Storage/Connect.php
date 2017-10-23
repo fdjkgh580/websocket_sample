@@ -30,6 +30,7 @@ class Connect
 		if (empty($datalist['connect_id']))
 		{
 			echo "ADD------------------------------- $connect_id \n";
+			
 			$this->table->set('client', 
 			[
 				'connect_id' => json_encode([$connect_id])

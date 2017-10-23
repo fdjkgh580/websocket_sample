@@ -16,7 +16,7 @@ class Websocket extends CI_Controller {
     public function run()
     {
         // Debug 
-        $this->is_print_command_line = false;
+        $this->is_print_command_line = true;
 
         $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
@@ -26,20 +26,15 @@ class Websocket extends CI_Controller {
         ]);
 
 
-        $this->room->use('table');
         $this->room->debug($this->is_print_command_line);
 
         $ws->on('open', function ($ws, $request) {
-
-            $this->room->connect('add', $request->fd);
-            var_dump($this->room->connect('get'));
 
             $this->command_line("■ 進入者編號：{$request->fd}\n");
 
         });
 
         $ws->on('message', function ($ws, $frame) {
-            return true;
 
             $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
 
