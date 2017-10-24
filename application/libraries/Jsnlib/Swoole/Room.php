@@ -17,16 +17,50 @@ class Room
 	// 暫存變數
 	protected $temp;
 
+	protected $connect_model;
+
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
 		$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 1024 * 200]);
 		$this->debug(false);
+
+		$this->connect_model = new \Model\Connect;
 	}
 
 	public function debug($bool = false)
 	{
 		$this->is_print_command_line = $bool;
+	}
+
+	/**
+	 * 連接
+	 * @param   $param->action     add | remove
+	 * @param   $param->user_id    使用者連線編號
+	 * @param   $param->ip         連線 IP (action = add)
+	 */
+	public function connect($param)
+	{
+		if (!isset($param->action)) die("須要參數 action");
+		
+		if ($param->action == "add") 
+		{
+			return $this->connect_model->insert(new \Jsnlib\Ao(
+			[
+				'connect_user_id' => $param->user_id,
+				'connect_ip' => $param->ip
+			]));
+		}
+		elseif ($param->action == "delete") 
+		{
+			return $this->connect_model->delete(new \Jsnlib\Ao(
+			[
+			    'connect_user_id' => $param->user_id
+			]));
+		}
+		else 
+			die('action 參數錯誤\n');
+		
 	}
 
 

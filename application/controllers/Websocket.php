@@ -12,6 +12,8 @@ class Websocket extends CI_Controller {
         $this->room = new \Lib\Jsnlib\Swoole\Room;
     }
 
+
+
     // 執行服務
     public function run()
     {
@@ -46,6 +48,16 @@ class Websocket extends CI_Controller {
 
     public function on_open($ws, $request)
     {
+        // 紀錄連線編號
+        $result = $this->room->connect(new \Jsnlib\Ao(
+        [
+            'action' => 'add',
+            'user_id' => $request->fd,
+            'ip' => $this->input->ip_address()
+        ]));
+        if ($result == 0)
+            $this->command_line("錯誤！進入者編號無法寫入\n");
+
         $this->command_line("■ 進入者編號：{$request->fd}\n");
     }
 
@@ -73,6 +85,15 @@ class Websocket extends CI_Controller {
     public function on_close($ws, $fd)
     {
         $this->command_line("離開者編號：{$fd} ----------- END\n\n");
+
+        // 移除連線編號
+        $result = $this->room->connect(new \Jsnlib\Ao(
+        [
+            'action' => 'delete',
+            'user_id' => $fd
+        ]));
+        if ($result == 0) 
+            $this->command_line("錯誤！離開者編號並無移除：{$fd}\n\n");
 
         $result = $this->room->leave($ws, $fd);
 
