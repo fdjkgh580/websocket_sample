@@ -18,14 +18,19 @@ class Room
 	protected $temp;
 
 	protected $connect_model;
+	protected $room_model;
+	protected $user_model;
 
 	function __construct()
 	{
 		$this->uobj = new \Lib\Jsnlib\Swoole\User;
-		$this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 1024 * 200]);
+		// $this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 1024 * 200]);
+		$this->storage = new \Lib\Jsnlib\Swoole\Storage\MySQL;
 		$this->debug(false);
 
 		$this->connect_model = new \Model\Connect;
+		$this->room_model = new \Model\Room;
+		$this->user_model = new \Model\User;
 	}
 
 	public function debug($bool = false)
@@ -64,29 +69,16 @@ class Room
 	}
 
 
-	/**
-	 * 解碼使用者的數據
-	 * @param  string $json_data     使用者的 json 加密數據
-	 * @param  string $chatroom_name 房間名稱
-	 * @return array                 [接收到 json 解碼後的物件, 房間名稱]
-	 */
-	public function decode_user_data($json_data, $chatroom_name = "chatroom"): array
-	{
-		$obj = json_decode($json_data);
-		if (!isset($obj->room_id)) return [$obj, false];
+	
 
-		$chatroom_name = "{$chatroom_name}_{$obj->room_id}";
-		return [$obj, $chatroom_name];
-	}
-
-	/**
-	 * 聊天室是否存在
-	 * @param    $chatroom_name 房間名稱 
-	 */
-	public function is_exits($chatroom_name): bool
-	{
-		return $this->storage->exist($chatroom_name);
-	}
+	// /**
+	//  * 聊天室是否存在
+	//  * @param    $chatroom_name 房間名稱 
+	//  */
+	// public function is_exits($chatroom_name): bool
+	// {
+	// 	return $this->storage->exist($chatroom_name);
+	// }
 
 
 	/**
@@ -158,28 +150,50 @@ class Room
 
 	/**
 	 * 發送歡迎訊息
-	 * @param   string 	    chatroom_name
-	 * @param   object      ws
-	 * @param   int/string  self
-	 * @param   array 	    data
-	 * @param   string 	    data['type']      into | message
-	 * @param   string 	    data['name']      歡迎誰的名字
+	 * @param ws
+	 * @param user_id
+	 * @param room_id
+	 * @param data[type, name]
 	 */
-	public function welcome($param)
+	public function welcome(array $param)
 	{
-		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
+		$roomlist = $this->room_model->list_all(new \Jsnlib\Ao(
+		[
+		    'room_key_id' => $param['room_id']
+		]));
 
-		$mix_user = implode(",", $user_id_box);
-		$this->command_line("使用者 {$param['self']} 發送歡迎訊息到成員 {$mix_user} \n");
+		$target = [];
+		foreach ($roomlist as $roominfo)
+		{
+			$target[] = $roominfo['room_user_id'];
+		}
+		$mixuser = implode(",", $mixuser);
 
-	 	\Jsnlib\Swoole::push_target(
-	 	[
-			'ws'           => $param['ws'],
-			'target'       => $user_id_box,
-			'self'         => $param['self'],
+		$this->command_line("使用者 {$param['user_id']} 發送歡迎訊息給成員： $mixuser \n");
+
+
+		\Jsnlib\Swoole::push_target(
+		[
+			'ws' => $param['ws'],
+			'target' => $target,
+			'self' => $param['user_id'],
 			'is_send_self' => true,
-			'data'         => json_encode($param['data'])
-	 	]);
+			'data' => json_encode($param['data'])
+		]);
+
+		// list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
+
+		// $mix_user = implode(",", $user_id_box);
+		// $this->command_line("使用者 {$param['self']} 發送歡迎訊息到成員 {$mix_user} \n");
+
+	 // 	\Jsnlib\Swoole::push_target(
+	 // 	[
+		// 	'ws'           => $param['ws'],
+		// 	'target'       => $user_id_box,
+		// 	'self'         => $param['self'],
+		// 	'is_send_self' => true,
+		// 	'data'         => json_encode($param['data'])
+	 // 	]);
 	}
 
 	/**
@@ -214,80 +228,77 @@ class Room
 	 */
 	public function leave($ws, $fd)
 	{
-		// 使用者離開前在哪個聊天室
-		$result = $this->where($fd);
-
-		if ($result === false)
-		{
-			return false;
-		}
-		// $result['room_id'];
-		// $result['user_id'];
-
-		// 取得使用者資料/名稱
-		$userdata = $this->user_get($fd);
-		
-
-		// 訊息通知該聊天室的所有人
-		$this->buybuy(
+		// 在哪個群組
+		$roominfo = $this->room_model->one(new \Jsnlib\Ao(
 		[
-			'chatroom_name' => "chatroom_{$result['room_id']}",
-			'ws' => $ws,
-			'self' => $fd,
-			'data' => 
-			[
-				'type' => 'leave',
-				'name' => $userdata['name']
-			]
-		]);
+		    'room_user_id' => $fd
+		]));
 
-		// 離開聊天室
-		$this->remove_user($fd);
+		// 沒有在群組
+		if ($roominfo === false) return false;
+
+
+		// 離開群組
+		$result = $this->room_model->leave(new \Jsnlib\Ao(
+		[
+		    'room_user_id' => $fd
+		]));
+		if ($result == 0)
+			$this->command_line("錯誤！使用者 {$fd} 沒有離開聊天室\n");
+
+		// 刪除使用者紀錄
+		$result = $this->user_model->delete(new \Jsnlib\Ao(
+		[
+		    'user_key_id' => $fd
+		]));
+		if ($result == 0)
+			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
+
 
 		return 
 		[
-			'room_id' => $result['room_id'],
+			'room_id' => $roominfo['room_key_id'],
 			'user_id' => $fd, 
 			'userdata' => $userdata
 		];
 	}
 
 
-	/**
-	 * 將使用者離開聊天室
-	 */
-	protected function remove_user($fd)
-	{
-		$this->temp = $fd;
+	// /**
+	//  * 將使用者離開聊天室
+	//  */
+	// protected function remove_user($fd)
+	// {
+	// 	$this->temp = $fd;
 
 
-		$this->each(function ($key, $chatroom_name)
-		{
-			$fd = $this->temp;
+	// 	$this->each(function ($key, $chatroom_name)
+	// 	{
+	// 		$fd = $this->temp;
 
-			list($chatroom, $user_id_box) = $this->userlist($chatroom_name);
+	// 		list($chatroom, $user_id_box) = $this->userlist($chatroom_name);
 
-			// 若在陣列中就刪除
-			if (in_array($fd, $user_id_box))
-			{
-				$key = array_search($fd, $user_id_box);
-				// echo "KEY: " . $key . "\n";
-				array_splice($user_id_box, $key, 1);
+	// 		// 若在陣列中就刪除
+	// 		if (in_array($fd, $user_id_box))
+	// 		{
+	// 			$key = array_search($fd, $user_id_box);
+	// 			// echo "KEY: " . $key . "\n";
+	// 			array_splice($user_id_box, $key, 1);
 
-			}
+	// 		}
 
-			// 重新編碼為 json 後寫入
-			$user_encode = json_encode($user_id_box);
-			$this->storage->set($chatroom_name, 
-			[
-				'room_id' => $chatroom['room_id'],
-				'user_id' => $user_encode
-			]);
+	// 		// 重新編碼為 json 後寫入
+	// 		$user_encode = json_encode($user_id_box);
+	// 		$this->storage->set($chatroom_name, 
+	// 		[
+	// 			'room_id' => $chatroom['room_id'],
+	// 			'user_id' => $user_encode
+	// 		]);
 		
-		});
+	// 	});
 
-		unset($this->temp);
-	}
+	// 	unset($this->temp);
+	// }
 
 	/**
 	 * 取得指定聊天室內的所有使用者編號
@@ -393,16 +404,16 @@ class Room
 		return $this;
 	}
 
-	/**
-	 * 記錄使用者
-	 * @param   int   user_key  使用者辨識鍵
-	 * @param   array user_val  使用者的附加資料
-	 */
-	public function user_insert($param): bool
-	{
-		$this->uobj->insert($param['user_key'], $param['user_val']);
-		return true;
-	}
+	// /**
+	//  * 記錄使用者
+	//  * @param   int   user_key  使用者辨識鍵
+	//  * @param   array user_val  使用者的附加資料
+	//  */
+	// public function user_insert($param): bool
+	// {
+	// 	$this->uobj->insert($param['user_key'], $param['user_val']);
+	// 	return true;
+	// }
 
 	public function user_get($user_key)
 	{
@@ -463,6 +474,68 @@ class Room
 				'user_id'       => $user_id
 			]);
 		}
+	}
+
+
+	public function get_message_and_send2($ws, $frame)
+	{
+		/**
+		 * $userdata[type, name, room_id]
+		 */
+		$userdata = json_decode($frame->data, true);
+
+		// 若沒有房間編號，代表一般文字訊息，那發送給所有使用者
+		if (empty($userdata['room_id']))
+		{
+			
+		}
+		else
+		{
+			if (!isset($userdata['type'])) $this->command_line("須要參數 type \n");
+			if (!isset($userdata['room_id'])) $this->command_line("須要參數 room_id \n");
+		}
+
+		// 加入群組
+		if ($userdata['type'] == "join") 
+		{
+			$this->command_line("使用者 {$frame->fd} 進入群組 {$userdata['room_id']} \n");
+
+			// 記錄使用者
+			$this->user_model->insert(new \Jsnlib\Ao(
+			[
+			    'user_key_id' => $frame->fd,
+			    'user_name' => $userdata['name']
+			]));
+
+			// 進入的房間
+			$this->room_model->insert(new \Jsnlib\Ao(
+			[
+			    'room_key_id' => $userdata['room_id'],
+			    'room_user_id' => $frame->fd,
+			]));
+
+			// 發送歡迎訊息
+			$this->welcome(
+			[
+				'ws' => $ws,
+				'user_id' => $frame->fd,
+				'room_id' => $userdata['room_id'],
+				'data' => 
+				[
+					'type' => 'into',
+					'name' => $userdata['name']
+				]
+			]);
+
+		}
+		// 發送訊息
+		elseif ($userdata['type'] == "message")
+		{
+		}
+		else
+			$this->command_line("無法識別參數 type \n");
+
+
 	}
 
 
