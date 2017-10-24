@@ -148,6 +148,23 @@ class Room
 		]);
 	}
 
+	protected function all_user($param)
+	{
+		// 取得與自己相同的坊間所有使用者編號
+		$roomlist = $this->room_model->list_all(new \Jsnlib\Ao(
+		[
+		    'room_key_id' => $param['room_id']
+		]));
+
+		$users = [];
+		foreach ($roomlist as $roominfo)
+		{
+			$users[] = $roominfo['room_user_id'];
+		}
+
+		return $users;
+	}
+
 	/**
 	 * 發送歡迎訊息
 	 * @param ws
@@ -157,17 +174,11 @@ class Room
 	 */
 	public function welcome(array $param)
 	{
-		$roomlist = $this->room_model->list_all(new \Jsnlib\Ao(
+		$users = $this->all_user(
 		[
-		    'room_key_id' => $param['room_id']
-		]));
-
-		$target = [];
-		foreach ($roomlist as $roominfo)
-		{
-			$target[] = $roominfo['room_user_id'];
-		}
-		$mixuser = implode(",", $mixuser);
+			'room_id' => $param['room_id']
+		]);
+		$mixuser = implode(",", $users);
 
 		$this->command_line("使用者 {$param['user_id']} 發送歡迎訊息給成員： $mixuser \n");
 
@@ -175,25 +186,11 @@ class Room
 		\Jsnlib\Swoole::push_target(
 		[
 			'ws' => $param['ws'],
-			'target' => $target,
+			'target' => $users,
 			'self' => $param['user_id'],
 			'is_send_self' => true,
 			'data' => json_encode($param['data'])
 		]);
-
-		// list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
-
-		// $mix_user = implode(",", $user_id_box);
-		// $this->command_line("使用者 {$param['self']} 發送歡迎訊息到成員 {$mix_user} \n");
-
-	 // 	\Jsnlib\Swoole::push_target(
-	 // 	[
-		// 	'ws'           => $param['ws'],
-		// 	'target'       => $user_id_box,
-		// 	'self'         => $param['self'],
-		// 	'is_send_self' => true,
-		// 	'data'         => json_encode($param['data'])
-	 // 	]);
 	}
 
 	/**
@@ -507,7 +504,7 @@ class Room
 			    'user_name' => $userdata['name']
 			]));
 
-			// 進入的房間
+			// 紀錄進入的房間
 			$this->room_model->insert(new \Jsnlib\Ao(
 			[
 			    'room_key_id' => $userdata['room_id'],
@@ -528,9 +525,30 @@ class Room
 			]);
 
 		}
-		// 發送訊息
+		// 發送給場內的所有使用者
 		elseif ($userdata['type'] == "message")
 		{
+			$users = $this->all_user(
+			[
+				'room_id' => $userdata['room_id']
+			]);
+
+			\Jsnlib\Swoole::push_target(
+			[
+				'ws' => $ws,
+				'target' => $users,
+				'self' => $frame->fd,
+				'is_send_self' => false,
+				'data' => $frame->data
+			]);
+
+			// $this->push_message(
+			// [
+			// 	'chatroom_name' => $chatroom_name,
+			// 	'ws'            => $ws,
+			// 	'self'          => $frame->fd,
+			// 	'data'          => $frame->data
+			// ]);
 		}
 		else
 			$this->command_line("無法識別參數 type \n");
