@@ -58,7 +58,7 @@ class Websocket extends CI_Controller {
         if ($result == 0)
             $this->command_line("錯誤！進入者編號無法寫入\n");
 
-        $this->command_line("■ 進入者編號：{$request->fd}\n");
+        $this->command_line("\n■ 進入者編號：{$request->fd}\n");
     }
 
     public function on_message($ws, $frame)
@@ -100,7 +100,8 @@ class Websocket extends CI_Controller {
         // 使用者編號沒有在任何群組內
         if ($result === false) return true;
 
-        
+        // print_r($result);
+
 
         // // 寫入DB
         // $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(

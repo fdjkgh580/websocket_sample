@@ -31,6 +31,13 @@ class Room
 		$this->connect_model = new \Model\Connect;
 		$this->room_model = new \Model\Room;
 		$this->user_model = new \Model\User;
+		$this->init();
+	}
+
+	public function init()
+	{
+		$this->room_model->clean();
+		$this->user_model->clean();
 	}
 
 	public function debug($bool = false)
@@ -148,7 +155,11 @@ class Room
 		]);
 	}
 
-	protected function all_user($param)
+	/**
+	 * 房間內的所有使用者
+	 * @param  room_id
+	 */
+	protected function all_user($param): array
 	{
 		// 取得與自己相同的坊間所有使用者編號
 		$roomlist = $this->room_model->list_all(new \Jsnlib\Ao(
@@ -193,29 +204,7 @@ class Room
 		]);
 	}
 
-	/**
-	 * 發送訊息到聊天室內所有的成員
-	 * @param   string 	    chatroom_name
-	 * @param   object      ws
-	 * @param   int/string  self
-	 * @param   array 	    data
-	 */
-	public function push_message($param)
-	{
-		list($chatroom, $user_id_box) = $this->userlist($param['chatroom_name']);
-
-		$mix_user = implode(",", $user_id_box);
-		$this->command_line("發送訊息到聊天室內所有的成員 {$mix_user} \n");
-
-	 	\Jsnlib\Swoole::push_target(
-		[
-			'ws'           => $param['ws'],
-			'target'       => $user_id_box,
-			'self'         => $param['self'],
-			'is_send_self' => false,
-			'data'         => $param['data']
-	 	]);
-	}
+	
 
 	/**
 	 * 離開
@@ -234,7 +223,6 @@ class Room
 		// 沒有在群組
 		if ($roominfo === false) return false;
 
-
 		// 離開群組
 		$result = $this->room_model->leave(new \Jsnlib\Ao(
 		[
@@ -242,6 +230,14 @@ class Room
 		]));
 		if ($result == 0)
 			$this->command_line("錯誤！使用者 {$fd} 沒有離開聊天室\n");
+
+		// 查詢使用者
+		$userinfo = $this->user_model->one(new \Jsnlib\Ao(
+		[
+		    'user_key_id' => $fd
+		]));
+		if ($userinfo === false)
+			$this->command_line("找不到使用者編號 {$fd} \n");
 
 		// 刪除使用者紀錄
 		$result = $this->user_model->delete(new \Jsnlib\Ao(
@@ -251,15 +247,62 @@ class Room
 		if ($result == 0)
 			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
 
+		// 發送離開訊息
+		$users = $this->push2users(
+		[
+			'ws' => $ws,
+			'room_id' => $roominfo->room_key_id,
+			'user_id' => $fd,
+			'data' => json_encode(
+			[
+				'type' => 'leave',
+				'name' => $userinfo->user_name
+			])
+		]);
+		if (count($users) > 0)
+			$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
+
+		
 
 		return 
 		[
 			'room_id' => $roominfo['room_key_id'],
 			'user_id' => $fd, 
-			'userdata' => $userdata
+			'userinfo' => 
+			[
+				'user_id' => $userinfo->user_id,
+				'user_key_id' => $userinfo->user_key_id,
+				'name' => $userinfo->user_name
+			]
 		];
 	}
 
+	/**
+	 * 推送訊息到聊天室的所有人，但不包含自己
+	 * @param ws
+	 * @param room_id
+	 * @param user_id
+	 * @param data
+	 * @return users
+	 */
+	public function push2users(array $param): array
+	{
+		$users = $this->all_user(
+		[
+			'room_id' => $param['room_id']
+		]);
+
+		\Jsnlib\Swoole::push_target(
+		[
+			'ws' => $param['ws'],
+			'target' => $users,
+			'self' => $param['user_id'],
+			'is_send_self' => false,
+			'data' => $param['data']
+		]);
+
+		return $users;
+	}
 
 	// /**
 	//  * 將使用者離開聊天室
@@ -528,32 +571,20 @@ class Room
 		// 發送給場內的所有使用者
 		elseif ($userdata['type'] == "message")
 		{
-			$users = $this->all_user(
-			[
-				'room_id' => $userdata['room_id']
-			]);
-
-			\Jsnlib\Swoole::push_target(
+			$users = $this->push2users(
 			[
 				'ws' => $ws,
-				'target' => $users,
-				'self' => $frame->fd,
-				'is_send_self' => false,
+				'room_id' => $userdata['room_id'],
+				'user_id' => $frame->fd,
 				'data' => $frame->data
 			]);
-
-			// $this->push_message(
-			// [
-			// 	'chatroom_name' => $chatroom_name,
-			// 	'ws'            => $ws,
-			// 	'self'          => $frame->fd,
-			// 	'data'          => $frame->data
-			// ]);
+			if (count($users) > 0)
+				$this->command_line("使用者 {$frame->fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
 		}
 		else
+		{
 			$this->command_line("無法識別參數 type \n");
-
-
+		}
 	}
 
 

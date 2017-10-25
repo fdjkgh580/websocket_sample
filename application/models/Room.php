@@ -45,4 +45,9 @@ class Room {
 		$query = $this->db->get();
 		return $this->result($query, "list");
 	}
+
+	public function clean()
+	{
+		$this->db->truncate('room');
+	}
 }

@@ -4,6 +4,17 @@ namespace Model;
 class User {
  
 	use Tool;
+
+	public function one($param)
+	{
+		$this->db->select('*');
+		$this->db->from('user');
+		$this->db->where('user_key_id', $param->user_key_id);
+		
+		// die($this->db->get_compiled_select());
+		$query = $this->db->get();
+		return $this->result($query, "info");
+	}
  
 	public function insert($param)
 	{
@@ -22,5 +33,10 @@ class User {
 		// die($this->db->get_compiled_delete('user'));
 		$this->db->delete('user');
 		return $this->db->affected_rows();
+	}
+
+	public function clean()
+	{
+		$this->db->truncate('user');
 	}
 }
