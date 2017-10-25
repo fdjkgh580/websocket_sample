@@ -188,20 +188,20 @@ class Room
 		if ($result == 0)
 			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
 
-		// 發送離開訊息
-		$users = $this->push2users(
-		[
-			'ws' => $ws,
-			'room_id' => $roominfo->room_key_id,
-			'user_id' => $fd,
-			'data' => json_encode(
-			[
-				'type' => 'leave',
-				'name' => $userinfo->user_name
-			])
-		]);
-		if (count($users) > 0)
-			$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
+		// // 發送離開訊息
+		// $users = $this->push2users(
+		// [
+		// 	'ws' => $ws,
+		// 	'room_id' => $roominfo->room_key_id,
+		// 	'user_id' => $fd,
+		// 	'data' => json_encode(
+		// 	[
+		// 		'type' => 'leave',
+		// 		'name' => $userinfo->user_name
+		// 	])
+		// ]);
+		// if (count($users) > 0)
+		// 	$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
 
 		// 寫入聊天紀錄：離開
 		$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
