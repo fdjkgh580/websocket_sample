@@ -66,20 +66,6 @@ class Websocket extends CI_Controller {
         $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
 
         $this->room->get_message_and_send($ws, $frame);
-
-        // $data_decode = json_decode($frame->data, true);
-        // $message = isset($data_decode['message']) ? $data_decode['message'] : null;
-
-        // if (!isset($data_decode['room_id'])) return true;
-        
-        // // 寫入DB
-        // $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
-        // [
-        //     'chat_room_id' => $data_decode['room_id'],
-        //     'chat_message' => $message,
-        //     'chat_connect_id' => $frame->fd,
-        //     'chat_option' => $frame->data
-        // ]));
     }
 
     public function on_close($ws, $fd)
@@ -100,20 +86,6 @@ class Websocket extends CI_Controller {
         // 使用者編號沒有在任何群組內
         if ($result === false) return true;
 
-        // print_r($result);
-
-
-        // // 寫入DB
-        // $last_insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
-        // [
-        //     'chat_room_id' => $result['room_id'],
-        //     'chat_message' => null,
-        //     'chat_connect_id' => $result['user_id'],
-        //     'chat_option' => json_encode([
-        //         'type' => 'leave',
-        //         'name' => $result['userdata']['name']
-        //     ])
-        // ]));
     }
 
 

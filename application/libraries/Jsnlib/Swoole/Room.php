@@ -20,6 +20,7 @@ class Room
 	protected $connect_model;
 	protected $room_model;
 	protected $user_model;
+	protected $chat_model;
 
 	function __construct()
 	{
@@ -31,6 +32,7 @@ class Room
 		$this->connect_model = new \Model\Connect;
 		$this->room_model = new \Model\Room;
 		$this->user_model = new \Model\User;
+		$this->chat_model = new \Model\Chat;
 		$this->init();
 	}
 
@@ -201,6 +203,19 @@ class Room
 		if (count($users) > 0)
 			$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
 
+		// 寫入聊天紀錄：離開
+		$this->chat_model->isnert(new \Jsnlib\Ao(
+		[
+		    'chat_room_id' => $roominfo->room_key_id,
+		    'chat_message' => null,
+		    'chat_connect_id' => $fd,
+		    'chat_option' => json_encode
+		    ([
+		        'type' => 'leave',
+		        'name' => $userinfo->user_name
+		    ])
+		]));
+
 		return 
 		[
 			'room_id' => $roominfo['room_key_id'],
@@ -306,6 +321,19 @@ class Room
 				]
 			]);
 
+			// 寫入聊天紀錄: 歡迎
+			$this->chat_model->isnert(new \Jsnlib\Ao(
+			[
+			    'chat_room_id' => $userdata['room_id'],
+			    'chat_message' => null,
+			    'chat_connect_id' => $frame->fd,
+			    'chat_option' => json_encode
+			    ([
+			        'type' => 'join',
+			        'name' => $userdata['name']
+			    ])
+			]));
+
 		}
 		// 發送給場內的所有使用者
 		elseif ($userdata['type'] == "message")
@@ -318,11 +346,20 @@ class Room
 				'data' => $frame->data
 			]);
 			if (count($users) > 0)
-				$this->command_line("使用者 {$frame->fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
+				$this->command_line("使用者 {$frame->fd} 發送訊息給成員: " . implode(",", $users) . "\n");
+
+			// 寫入聊天紀錄: 聊天訊息
+			$this->chat_model->isnert(new \Jsnlib\Ao(
+			[
+			    'chat_room_id' => $userdata['room_id'],
+			    'chat_message' => json_decode($frame->data, true)['message'],
+			    'chat_connect_id' => $frame->fd,
+			    'chat_option' => $frame->data
+			]));
 		}
 		else
 		{
-			// 一般訊息
+			// 一般訊息，不寫入聊天紀錄
 		}
 	}
 
