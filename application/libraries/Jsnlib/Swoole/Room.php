@@ -11,9 +11,6 @@ class Room
 	// 所有的聊天室名稱
 	protected $box = [];
 
-	// 使用者物件，用來記錄使用者的類別
-	protected $uobj;
-
 	// 暫存變數
 	protected $temp;
 
@@ -24,7 +21,6 @@ class Room
 
 	function __construct()
 	{
-		$this->uobj = new \Lib\Jsnlib\Swoole\User;
 		// $this->storage = new \Lib\Jsnlib\Swoole\Storage\Table(['size' => 1024 * 200]);
 		$this->storage = new \Lib\Jsnlib\Swoole\Storage\MySQL;
 		$this->debug(false);
@@ -60,18 +56,22 @@ class Room
 		
 		if ($param->action == "add") 
 		{
-			return $this->connect_model->insert(new \Jsnlib\Ao(
+			$insert_id = $this->connect_model->insert(new \Jsnlib\Ao(
 			[
 				'connect_user_id' => $param->user_id,
 				'connect_ip' => $param->ip
 			]));
+			if (empty($insert_id))
+				$this->command_line("增加連接紀錄錯誤，使用者 {$param->user_id}\n");
 		}
 		elseif ($param->action == "delete") 
 		{
-			return $this->connect_model->delete(new \Jsnlib\Ao(
+			$insert_id = $this->connect_model->delete(new \Jsnlib\Ao(
 			[
 			    'connect_user_id' => $param->user_id
 			]));
+			if (empty($insert_id))
+				$this->command_line("刪除連接紀錄錯誤，使用者 {$param->user_id}\n");
 		}
 		else 
 		{
@@ -204,7 +204,7 @@ class Room
 			$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
 
 		// 寫入聊天紀錄：離開
-		$this->chat_model->isnert(new \Jsnlib\Ao(
+		$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 		[
 		    'chat_room_id' => $roominfo->room_key_id,
 		    'chat_message' => null,
@@ -215,6 +215,8 @@ class Room
 		        'name' => $userinfo->user_name
 		    ])
 		]));
+		if (empty($insert_id))
+			$this->command_line("寫入離開紀錄錯誤，使用者 {$fd}\n");
 
 		return 
 		[
@@ -249,7 +251,7 @@ class Room
 			'ws' => $param['ws'],
 			'target' => $users,
 			'self' => $param['user_id'],
-			'is_send_self' => false,
+			'is_send_self' => true,
 			'data' => $param['data']
 		]);
 
@@ -295,18 +297,22 @@ class Room
 			$this->command_line("使用者 {$frame->fd} 進入群組 {$userdata['room_id']} \n");
 
 			// 記錄使用者名稱
-			$this->user_model->insert(new \Jsnlib\Ao(
+			$insert_id = $this->user_model->insert(new \Jsnlib\Ao(
 			[
 			    'user_key_id' => $frame->fd,
 			    'user_name' => $userdata['name']
 			]));
+			if (empty($insert_id))
+				$this->command_line("紀錄使用者名稱錯誤：使用者 {$frame->fd}\n");
 
 			// 紀錄進入的房間
-			$this->room_model->insert(new \Jsnlib\Ao(
+			$insert_id = $this->room_model->insert(new \Jsnlib\Ao(
 			[
 			    'room_key_id' => $userdata['room_id'],
 			    'room_user_id' => $frame->fd,
 			]));
+			if (empty($insert_id))
+				$this->command_line("紀錄進入的房間錯誤：使用者 {$frame->fd} 群組 {$userdata['room_id']}\n");
 
 			// 發送歡迎訊息
 			$this->welcome(
@@ -322,7 +328,7 @@ class Room
 			]);
 
 			// 寫入聊天紀錄: 歡迎
-			$this->chat_model->isnert(new \Jsnlib\Ao(
+			$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 			[
 			    'chat_room_id' => $userdata['room_id'],
 			    'chat_message' => null,
@@ -333,6 +339,8 @@ class Room
 			        'name' => $userdata['name']
 			    ])
 			]));
+			if (empty($insert_id))
+				$this->command_line("寫入歡迎紀錄發生錯誤，使用者：{$frame->fd}\n");
 
 		}
 		// 發送給場內的所有使用者
@@ -349,13 +357,15 @@ class Room
 				$this->command_line("使用者 {$frame->fd} 發送訊息給成員: " . implode(",", $users) . "\n");
 
 			// 寫入聊天紀錄: 聊天訊息
-			$this->chat_model->isnert(new \Jsnlib\Ao(
+			$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 			[
 			    'chat_room_id' => $userdata['room_id'],
 			    'chat_message' => json_decode($frame->data, true)['message'],
 			    'chat_connect_id' => $frame->fd,
 			    'chat_option' => $frame->data
 			]));
+			if (empty($insert_id))
+				$this->command_line("寫入聊天紀錄錯誤，使用者 {$frame->fd}\n");
 		}
 		else
 		{

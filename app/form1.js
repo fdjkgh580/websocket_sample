@@ -39,6 +39,11 @@ $(function (){
                 $(".preview").css("background-image", 'url(null)').removeAttr("data-base64")
             }
 
+            // 訊息滾到置底
+            this.scroll_bottom = function (){
+                $("ul.chat").scrollTop($("ul.chat").height());
+            }
+
             // 送出表單
             this.submit = function (){
                 vs.root.on("submit", function (){
@@ -58,13 +63,13 @@ $(function (){
                     // 發送到對方
                     $.vmodel.get("websocket").send(data)
 
-                    // 也傳到己方
-                    $.vmodel.get("chatHelper").new_message(data)
-                    $.vmodel.get("chatHelper").name_lcok();
+                    // // 也傳到己方
+                    // $.vmodel.get("chatHelper").new_message(data)
+                    // $.vmodel.get("chatHelper").name_lcok();
 
                     // 訊息滾到置底
-                    $("ul.chat").scrollTop($("ul.chat").height());
-
+                    vs.scroll_bottom();
+                    
                     vs.reset_message();
 
                     return false;
