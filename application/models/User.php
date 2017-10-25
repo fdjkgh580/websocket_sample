@@ -5,6 +5,16 @@ class User {
  
 	use Tool;
 
+	public function list_all($param = false)
+	{
+		$this->db->select('*');
+		$this->db->from('user');
+		
+		// die($this->db->get_compiled_select());
+		$query = $this->db->get();
+		return $this->result($query, "list");
+	}
+
 	public function one($param)
 	{
 		$this->db->select('*');

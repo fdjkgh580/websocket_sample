@@ -4,6 +4,16 @@ namespace Model;
 class Connect {
  
 	use Tool;
+
+	public function list_all()
+	{
+		$this->db->select('*');
+		$this->db->from('connect');
+		
+		// die($this->db->get_compiled_select());
+		$query = $this->db->get();
+		return $this->result($query, "list");
+	}
  
 	public function insert($param)
 	{
@@ -22,5 +32,10 @@ class Connect {
  		// die($this->db->get_compiled_delete('connect'));
  		$this->db->delete('connect');
  		return $this->db->affected_rows();
+ 	}
+
+ 	public function clean()
+ 	{
+ 		$this->db->truncate('connect');
  	}
 }

@@ -65,7 +65,7 @@ class Websocket extends CI_Controller {
     {
         $this->command_line("收到進入者 {$frame->fd} 訊息: {$frame->data} \n");
 
-        $this->room->get_message_and_send2($ws, $frame);
+        $this->room->get_message_and_send($ws, $frame);
 
         // $data_decode = json_decode($frame->data, true);
         // $message = isset($data_decode['message']) ? $data_decode['message'] : null;

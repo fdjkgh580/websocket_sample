@@ -29,7 +29,7 @@ class Client extends CI_Controller {
 		    var_dump($frame->data);
 
 		    // 關閉連接
-		    // $_cli->close();
+		    $_cli->close();
 		});
 
 		$cli->upgrade('/', function ($cli) {
