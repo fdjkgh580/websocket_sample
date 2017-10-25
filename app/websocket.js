@@ -45,6 +45,9 @@ $(function (){
                 else {
                     $.vmodel.get("chatHelper").debug('接收到的訊息無法分類');
                 }
+
+                $.vmodel.get("event").scroll_bottom();
+                
             }
 
             this.onopen = function (e){
