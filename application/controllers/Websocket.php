@@ -18,14 +18,15 @@ class Websocket extends CI_Controller {
     public function run()
     {
         // Debug 
-        $this->is_print_command_line = false;
+        $this->is_print_command_line = true;
 
         $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
-        $ws->set([
-            'worker_num' => 1,    //worker process num
-            // 'backlog' => 128,   //listen backlog
-        ]);
+        // $ws->set([
+        //     // 'reactor_num' => 2,
+        //     // 'worker_num' => 1,    //worker process num
+        //     // 'backlog' => 128,   //listen backlog
+        // ]);
 
 
         $this->room->debug($this->is_print_command_line);
@@ -38,7 +39,7 @@ class Websocket extends CI_Controller {
             $this->on_message($ws, $frame);
         });
 
-        $ws->on('close', function ($ws, $fd) {
+        $ws->on('close', function ($ws, $fd, $reactorId) {
             $this->on_close($ws, $fd);
         });
 
@@ -49,14 +50,12 @@ class Websocket extends CI_Controller {
     public function on_open($ws, $request)
     {
         // 紀錄連線編號
-        $result = $this->room->connect(new \Jsnlib\Ao(
+        $this->room->connect(new \Jsnlib\Ao(
         [
             'action' => 'add',
             'user_id' => $request->fd,
             'ip' => $this->input->ip_address()
         ]));
-        if ($result == 0)
-            $this->command_line("錯誤！進入者編號無法寫入\n");
 
         $this->command_line("\n■ 進入者編號：{$request->fd}\n");
     }
@@ -70,7 +69,9 @@ class Websocket extends CI_Controller {
 
     public function on_close($ws, $fd)
     {
-        $this->command_line("離開者編號：{$fd} ----------- END\n\n");
+
+        // 離開聊天室
+        $result = $this->room->leave($ws, $fd);
 
         // 移除連線編號
         $result = $this->room->connect(new \Jsnlib\Ao(
@@ -78,13 +79,14 @@ class Websocket extends CI_Controller {
             'action' => 'delete',
             'user_id' => $fd
         ]));
-        if ($result == 0) 
-            $this->command_line("錯誤！離開者編號並無移除：{$fd}\n\n");
 
-        $result = $this->room->leave($ws, $fd);
+        $this->command_line("離線，使用者編號：{$fd} ----------- END\n\n");
 
         // 使用者編號沒有在任何群組內
-        if ($result === false) return true;
+        if ($result === false) 
+        {
+            $ws->push($fd, json_encode([null]));
+        }
 
     }
 

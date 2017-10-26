@@ -39,6 +39,7 @@ class Room
 		$this->connect_model->clean();
 	}
 
+
 	public function debug($bool = false)
 	{
 		$this->is_print_command_line = $bool;
@@ -62,16 +63,16 @@ class Room
 				'connect_ip' => $param->ip
 			]));
 			if (empty($insert_id))
-				$this->command_line("增加連接紀錄錯誤，使用者 {$param->user_id}\n");
+				$this->command_line("錯誤，無法增加連接紀錄，使用者 {$param->user_id}\n");
 		}
 		elseif ($param->action == "delete") 
 		{
-			$insert_id = $this->connect_model->delete(new \Jsnlib\Ao(
+			$num = $this->connect_model->delete(new \Jsnlib\Ao(
 			[
 			    'connect_user_id' => $param->user_id
 			]));
-			if (empty($insert_id))
-				$this->command_line("刪除連接紀錄錯誤，使用者 {$param->user_id}\n");
+			if ($num == 0)
+				$this->command_line("錯誤，無法刪除連接紀錄，使用者 {$param->user_id}\n");
 		}
 		else 
 		{
@@ -155,7 +156,26 @@ class Room
 	 */
 	public function leave($ws, $fd)
 	{
-		// 在哪個群組
+		$this->command_line(" > > > > Leave \n");
+
+		// 查詢使用者名稱資料
+		$userinfo = $this->user_model->one(new \Jsnlib\Ao(
+		[
+		    'user_key_id' => $fd
+		]));
+		if ($userinfo === false)
+			$this->command_line("找不到使用者編號 {$fd} \n");
+
+		// 刪除使用者
+		$result = $this->user_model->delete(new \Jsnlib\Ao(
+		[
+		    'user_key_id' => $fd
+		]));
+		if ($result == 0)
+			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
+
+
+		// 查詢使用者在哪個群組
 		$roominfo = $this->room_model->one(new \Jsnlib\Ao(
 		[
 		    'room_user_id' => $fd
@@ -164,44 +184,34 @@ class Room
 		// 沒有在群組
 		if ($roominfo === false) return false;
 
+		// 發送離開訊息
+		// swoole 已把使用者編號設定為 closed 後才觸發 onClose() ，所以下方不可發送給自己
+		$users = $this->push2users(
+		[
+			'ws' => $ws,
+			'room_id' => $roominfo->room_key_id,
+			'user_id' => $fd,
+			'is_send_self' => false,
+			'data' => json_encode(
+			[
+				'type' => 'leave',
+				'name' => $userinfo->user_name
+			])
+		]);
+		if (count($users) > 0)
+			$this->command_line("使用者 {$fd} 發送離開訊息到聊天室 {$roominfo->room_key_id}，有成員: " . implode(",", $users) . "\n");
+		else
+			$this->command_line("使用者 {$fd} 未發送離開訊息到聊天室 {$roominfo->room_key_id}，因為沒有成員\n");
+
 		// 離開群組
 		$result = $this->room_model->leave(new \Jsnlib\Ao(
 		[
 		    'room_user_id' => $fd
 		]));
-		if ($result == 0)
+		if ($result < 1)
 			$this->command_line("錯誤！使用者 {$fd} 沒有離開聊天室\n");
-
-		// 查詢使用者
-		$userinfo = $this->user_model->one(new \Jsnlib\Ao(
-		[
-		    'user_key_id' => $fd
-		]));
-		if ($userinfo === false)
-			$this->command_line("找不到使用者編號 {$fd} \n");
-
-		// 刪除使用者紀錄
-		$result = $this->user_model->delete(new \Jsnlib\Ao(
-		[
-		    'user_key_id' => $fd
-		]));
-		if ($result == 0)
-			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
-
-		// // 發送離開訊息
-		// $users = $this->push2users(
-		// [
-		// 	'ws' => $ws,
-		// 	'room_id' => $roominfo->room_key_id,
-		// 	'user_id' => $fd,
-		// 	'data' => json_encode(
-		// 	[
-		// 		'type' => 'leave',
-		// 		'name' => $userinfo->user_name
-		// 	])
-		// ]);
-		// if (count($users) > 0)
-		// 	$this->command_line("使用者 {$fd} 發送離開訊息給成員: " . implode(",", $users) . "\n");
+		else 
+			$this->command_line("使用者 {$fd} 離開聊天室 {$roominfo->room_key_id} \n");
 
 		// 寫入聊天紀錄：離開
 		$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
@@ -232,15 +242,21 @@ class Room
 	}
 
 	/**
-	 * 推送訊息到聊天室的所有人，但不包含自己
+	 * 推送訊息到聊天室的所有人
 	 * @param ws
 	 * @param room_id
 	 * @param user_id
+	 * @param *is_send_self 是否包含自己？是
 	 * @param data
 	 * @return users
 	 */
 	public function push2users(array $param): array
 	{
+		$param += 
+		[
+			'is_send_self' => true
+		];
+
 		$users = $this->all_user(
 		[
 			'room_id' => $param['room_id']
@@ -251,7 +267,7 @@ class Room
 			'ws' => $param['ws'],
 			'target' => $users,
 			'self' => $param['user_id'],
-			'is_send_self' => true,
+			'is_send_self' => $param['is_send_self'],
 			'data' => $param['data']
 		]);
 
