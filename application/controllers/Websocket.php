@@ -18,7 +18,7 @@ class Websocket extends CI_Controller {
     public function run()
     {
         // Debug 
-        $this->is_print_command_line = true;
+        $this->is_print_command_line = false;
 
         $ws = new swoole_websocket_server("0.0.0.0", 8080); // 0.0.0.0 等於 localhost
 
