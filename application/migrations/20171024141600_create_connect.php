@@ -5,18 +5,22 @@ class Migration_Create_connect extends CI_Migration {
 
         public function up()
         {
-        	$this->dbforge->add_field([
-        		'connect_id' => [
+        	$this->dbforge->add_field
+            ([
+        		'connect_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         			'unsigned' => TRUE, // 非負數？
                     'auto_increment' => TRUE
         		],
-        		'connect_user_id' => [
+        		'connect_user_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         		],
-        		'connect_ip' => [
+        		'connect_ip' => 
+                [
         			'type' => 'varchar',
         			'constraint' => 20,
                     'null' => TRUE

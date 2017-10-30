@@ -5,19 +5,23 @@ class Migration_Create_user extends CI_Migration {
 
         public function up()
         {
-        	$this->dbforge->add_field([
-        		'user_id' => [
+        	$this->dbforge->add_field
+            ([
+        		'user_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         			'unsigned' => TRUE, // 非負數？
                     'auto_increment' => TRUE
         		],
-                'user_key_id' => [
+                'connect_user_id' => 
+                [
                     'type' => 'int',
                     'constraint' => 10,
                     'unsigned' => TRUE, // 非負數？
                 ],
-                'user_name' => [
+                'user_name' => 
+                [
                     'type' => 'varchar',
                     'constraint' => 50,
                 ],
@@ -28,7 +32,7 @@ class Migration_Create_user extends CI_Migration {
         	$this->dbforge->add_field("user_updated_at datetime on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
 
             $this->dbforge->add_key('user_id', TRUE);
-            $this->dbforge->add_key('user_key_id', TRUE);
+            $this->dbforge->add_key('connect_user_id', TRUE);
             
             $this->dbforge->create_table('user');
         }

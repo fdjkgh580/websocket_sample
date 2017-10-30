@@ -5,19 +5,23 @@ class Migration_Create_room extends CI_Migration {
 
         public function up()
         {
-        	$this->dbforge->add_field([
-        		'room_id' => [
+        	$this->dbforge->add_field
+            ([
+        		'room_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         			'unsigned' => TRUE, // 非負數？
                     'auto_increment' => TRUE
         		],
-                'room_key_id' => [
+                'chat_room_id' => 
+                [
                     'type' => 'int',
                     'constraint' => 10,
                     'unsigned' => TRUE, // 非負數？
                 ],
-        		'room_user_id' => [
+        		'connect_user_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
                     'unsigned' => TRUE, // 非負數？
@@ -29,7 +33,7 @@ class Migration_Create_room extends CI_Migration {
         	$this->dbforge->add_field("room_updated_at datetime on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
 
             $this->dbforge->add_key('room_id', TRUE);
-            $this->dbforge->add_key('room_key_id');
+            $this->dbforge->add_key('chat_room_id');
             $this->dbforge->add_key('room_user_id');
             
             $this->dbforge->create_table('room');

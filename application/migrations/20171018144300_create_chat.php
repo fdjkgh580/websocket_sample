@@ -5,27 +5,33 @@ class Migration_Create_chat extends CI_Migration {
 
         public function up()
         {
-        	$this->dbforge->add_field([
-        		'chat_id' => [
+        	$this->dbforge->add_field
+            ([
+        		'chat_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         			'unsigned' => TRUE, // 非負數？
                     'auto_increment' => TRUE
         		],
-        		'chat_room_id' => [
+        		'chat_room_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         		],
-        		'chat_message' => [
+        		'chat_message' => 
+                [
         			'type' => 'longtext',
         			'null' => true
         		],
-        		'chat_connect_id' => [
+        		'connect_user_id' => 
+                [
         			'type' => 'int',
         			'constraint' => 10,
         			'unsigned' => TRUE,
         		],
-                'chat_option' => [
+                'chat_option' => 
+                [
                     'type' => 'longtext',
                     'null' => TRUE
                 ]
