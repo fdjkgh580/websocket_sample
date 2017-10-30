@@ -8,7 +8,7 @@ class Room {
 	public function insert($param)
 	{
 		$this->db->set('room_key_id', $param->room_key_id);
-		$this->db->set('room_user_id', $param->room_user_id);
+		$this->db->set('connect_user_id', $param->connect_user_id);
 		
 		// die($this->db->get_compiled_insert('room'));
 		$this->db->insert('room');
@@ -17,7 +17,7 @@ class Room {
 
 	public function leave($param)
 	{
-		$this->db->where('room_user_id', $param->room_user_id);
+		$this->db->where('connect_user_id', $param->connect_user_id);
 		
 		// die($this->db->get_compiled_delete('room'));
 		$this->db->delete('room');
@@ -28,7 +28,7 @@ class Room {
 	{
 		$this->db->select('*');
 		$this->db->from('room');
-		$this->db->where('room_user_id', $param->room_user_id);
+		$this->db->where('connect_user_id', $param->connect_user_id);
 		
 		// die($this->db->get_compiled_select());
 		$query = $this->db->get();

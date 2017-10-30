@@ -14,7 +14,7 @@ class Migration_Create_chat extends CI_Migration {
         			'unsigned' => TRUE, // 非負數？
                     'auto_increment' => TRUE
         		],
-        		'chat_room_id' => 
+        		'room_key_id' => 
                 [
         			'type' => 'int',
         			'constraint' => 10,

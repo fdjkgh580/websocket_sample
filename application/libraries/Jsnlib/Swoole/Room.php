@@ -111,7 +111,7 @@ class Room
 			$users = [];
 			foreach ($roomlist as $roominfo)
 			{
-				$users[] = $roominfo['room_user_id'];
+				$users[] = $roominfo['connect_user_id'];
 			}
 		}
 
@@ -161,7 +161,7 @@ class Room
 		// 查詢使用者名稱資料
 		$userinfo = $this->user_model->one(new \Jsnlib\Ao(
 		[
-		    'user_key_id' => $fd
+		    'connect_user_id' => $fd
 		]));
 		if ($userinfo === false)
 			$this->command_line("找不到使用者編號 {$fd} \n");
@@ -169,7 +169,7 @@ class Room
 		// 刪除使用者
 		$result = $this->user_model->delete(new \Jsnlib\Ao(
 		[
-		    'user_key_id' => $fd
+		    'connect_user_id' => $fd
 		]));
 		if ($result == 0)
 			$this->command_line("錯誤！使用者 {$fd} 紀錄未刪除\n");
@@ -178,7 +178,7 @@ class Room
 		// 查詢使用者在哪個群組
 		$roominfo = $this->room_model->one(new \Jsnlib\Ao(
 		[
-		    'room_user_id' => $fd
+		    'connect_user_id' => $fd
 		]));
 
 		// 沒有在群組
@@ -206,7 +206,7 @@ class Room
 		// 離開群組
 		$result = $this->room_model->leave(new \Jsnlib\Ao(
 		[
-		    'room_user_id' => $fd
+		    'connect_user_id' => $fd
 		]));
 		if ($result < 1)
 			$this->command_line("錯誤！使用者 {$fd} 沒有離開聊天室\n");
@@ -216,9 +216,9 @@ class Room
 		// 寫入聊天紀錄：離開
 		$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 		[
-		    'chat_room_id' => $roominfo->room_key_id,
+		    'room_key_id' => $roominfo->room_key_id,
 		    'chat_message' => null,
-		    'chat_connect_id' => $fd,
+		    'connect_user_id' => $fd,
 		    'chat_option' => json_encode
 		    ([
 		        'type' => 'leave',
@@ -235,7 +235,7 @@ class Room
 			'userinfo' => 
 			[
 				'user_id' => $userinfo->user_id,
-				'user_key_id' => $userinfo->user_key_id,
+				'connect_user_id' => $userinfo->connect_user_id,
 				'name' => $userinfo->user_name
 			]
 		];
@@ -307,6 +307,7 @@ class Room
 			if (!isset($userdata['room_id'])) $this->command_line("須要參數 room_id \n");
 		}
 
+
 		// 加入群組
 		if ($userdata['type'] == "join") 
 		{
@@ -315,7 +316,7 @@ class Room
 			// 記錄使用者名稱
 			$insert_id = $this->user_model->insert(new \Jsnlib\Ao(
 			[
-			    'user_key_id' => $frame->fd,
+			    'connect_user_id' => $frame->fd,
 			    'user_name' => $userdata['name']
 			]));
 			if (empty($insert_id))
@@ -325,7 +326,7 @@ class Room
 			$insert_id = $this->room_model->insert(new \Jsnlib\Ao(
 			[
 			    'room_key_id' => $userdata['room_id'],
-			    'room_user_id' => $frame->fd,
+			    'connect_user_id' => $frame->fd,
 			]));
 			if (empty($insert_id))
 				$this->command_line("紀錄進入的房間錯誤：使用者 {$frame->fd} 群組 {$userdata['room_id']}\n");
@@ -346,9 +347,9 @@ class Room
 			// 寫入聊天紀錄: 歡迎
 			$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 			[
-			    'chat_room_id' => $userdata['room_id'],
+			    'room_key_id' => $userdata['room_id'],
 			    'chat_message' => null,
-			    'chat_connect_id' => $frame->fd,
+			    'connect_user_id' => $frame->fd,
 			    'chat_option' => json_encode
 			    ([
 			        'type' => 'join',
@@ -375,9 +376,9 @@ class Room
 			// 寫入聊天紀錄: 聊天訊息
 			$insert_id = $this->chat_model->isnert(new \Jsnlib\Ao(
 			[
-			    'chat_room_id' => $userdata['room_id'],
+			    'room_key_id' => $userdata['room_id'],
 			    'chat_message' => json_decode($frame->data, true)['message'],
-			    'chat_connect_id' => $frame->fd,
+			    'connect_user_id' => $frame->fd,
 			    'chat_option' => $frame->data
 			]));
 			if (empty($insert_id))

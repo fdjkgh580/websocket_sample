@@ -49,6 +49,8 @@ class Websocket extends CI_Controller {
 
     public function on_open($ws, $request)
     {
+        $this->command_line("\n■ 進入者編號：{$request->fd}\n");
+        
         // 紀錄連線編號
         $this->room->connect(new \Jsnlib\Ao(
         [
@@ -56,8 +58,6 @@ class Websocket extends CI_Controller {
             'user_id' => $request->fd,
             'ip' => $this->input->ip_address()
         ]));
-
-        $this->command_line("\n■ 進入者編號：{$request->fd}\n");
     }
 
     public function on_message($ws, $frame)

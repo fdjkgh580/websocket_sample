@@ -19,7 +19,7 @@ class User {
 	{
 		$this->db->select('*');
 		$this->db->from('user');
-		$this->db->where('user_key_id', $param->user_key_id);
+		$this->db->where('connect_user_id', $param->connect_user_id);
 		
 		// die($this->db->get_compiled_select());
 		$query = $this->db->get();
@@ -28,7 +28,7 @@ class User {
  
 	public function insert($param)
 	{
-		$this->db->set('user_key_id', $param->user_key_id);
+		$this->db->set('connect_user_id', $param->connect_user_id);
 		$this->db->set('user_name', $param->user_name);
 		
 		// die($this->db->get_compiled_insert('user'));
@@ -38,7 +38,7 @@ class User {
 
 	public function delete($param)
 	{
-		$this->db->where('user_key_id', $param->user_key_id);
+		$this->db->where('connect_user_id', $param->connect_user_id);
 		
 		// die($this->db->get_compiled_delete('user'));
 		$this->db->delete('user');
