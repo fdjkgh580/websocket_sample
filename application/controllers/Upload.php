@@ -55,7 +55,8 @@ class Upload extends CI_Controller {
 		}
 		else 
 		{
-			throw new Exception("不允許的檔案類型");
+			list($filename, $pathfile) = $this->copy_file($key, $name);
+			$filetype = "application";
 		}
 
 

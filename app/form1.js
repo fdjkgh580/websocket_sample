@@ -63,11 +63,11 @@ $(function (){
                         console.log("附件上傳了 " + percentComplete + "%")
                     },
                     success: function (obj){
-                        // console.log(obj);
+                        console.log(obj);
                         var box = {};
 
                         $.each(obj, function (key, item){
-                            if (item.type == "video" || item.type == "image") {
+                            if (item.type == "video" || item.type == "image" || item.type == "application") {
                                 var filetype = item.type;
                             }
                             else {
@@ -75,7 +75,7 @@ $(function (){
                                 return false;
                             }
 
-                            box[key] = _multi_code(filetype, item.url)
+                            box[key] = _multi_code(filetype, item.name, item.url)
                         });
 
                         var encode = JSON.stringify(box);
@@ -88,10 +88,11 @@ $(function (){
                 }); 
             }
 
-            var _multi_code = function (filetype, url) {
+            var _multi_code = function (filetype, name, url) {
 
                 var code = {
                     type: filetype,
+                    name: name,
                     url: url
                 }
 

@@ -45,6 +45,14 @@ $(function (){
                             "<video class='attachment_video' src='" + item.url + "' width='150' height='150' controls></video>"
                         '</li>';
                     }
+                    else if (item.type == "application") {
+                        console.log(item)
+                        var li = 
+                        '<li>' + 
+                            "<span>" + obj.name + " 傳送了檔案：" + "</span>" + 
+                            "<a href='" + item.url + "'>" + item.name + "</a>" +
+                        '</li>';
+                    }
 
                     $(".chat").append(li)
 
