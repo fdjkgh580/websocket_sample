@@ -8,7 +8,8 @@
     "jquery": "master",
     "vmodel.js": "master",
     "vpage.js": "master",
-    "file-preview.js": "master"
+    "file-preview.js": "master",
+    "jquery-form": "master"
   },
   "main": "",
   "license": "MIT",

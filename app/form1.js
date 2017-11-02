@@ -44,6 +44,66 @@ $(function (){
                 $("ul.chat").scrollTop($("ul.chat").height());
             }
 
+            // 是否有夾帶附件
+            this.is_choice_attachement = function (){
+                var val = vs.root.find(".attachment").val();
+                return val == "" ? false: true;
+            }
+
+            this.submit_use_http = function (formthis){
+                var url = $(formthis).attr("data-attachment-url");
+
+                $(formthis).ajaxSubmit({
+                    url: url,
+                    data: {
+                        say: 'hello',
+                    },
+                    method: "POST", 
+                    uploadProgress: function (event, position, total, percentComplete){
+                        console.log("附件上傳了 " + percentComplete + "%")
+                    },
+                    success: function (obj){
+                        // console.log(obj);
+                        var box = {};
+
+                        $.each(obj, function (key, item){
+                            if (item.type == "video" || item.type == "image") {
+                                var filetype = item.type;
+                            }
+                            else {
+                                console.log("Error: image type");
+                                return false;
+                            }
+
+                            box[key] = _multi_code(filetype, item.url)
+                        });
+
+                        var encode = JSON.stringify(box);
+
+                        _set_message(encode);
+                    },
+                    error: function (data){
+                        console.log('error')
+                        console.log(data)
+                    }
+                }); 
+            }
+
+            var _multi_code = function (filetype, url) {
+
+                var code = {
+                    type: filetype,
+                    url: url
+                }
+
+                return  code;
+            }
+
+            // 將字串放到文字對話框
+            var _set_message = function (msg){
+                vs.root.find(".message").val(msg);
+            }
+
             // 送出表單
             this.submit = function (){
                 vs.root.on("submit", function (){
@@ -71,6 +131,10 @@ $(function (){
                     vs.scroll_bottom();
                     
                     vs.reset_message();
+
+                    if (vs.is_choice_attachement() === true) {
+                        vs.submit_use_http(this);
+                    }
 
                     return false;
                 });

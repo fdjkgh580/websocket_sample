@@ -11,13 +11,14 @@
 	  crossorigin="anonymous"></script>
 	<script src="bower_components/vmodel.js/src/jquery.vmodel.min.js"></script>
 	<script src="bower_components/file-preview.js/src/jquery.file-preview.min.js"></script>
+	<script src="bower_components/jquery-form/dist/jquery.form.min.js"></script>
 	<script src="app/form1.js?t=<?=time()?>"></script>
 	<script src="app/chatHelper.js?t=<?=time()?>"></script>
 	<script src="app/websocket.js?t=<?=time()?>"></script>
 </head>
 <body>
 
-	<form class="form1">
+	<form class="form1" enctype="multipart/form-data" data-attachment-url="<?=site_url("upload");?>">
 
 		<input type="text" class="name" value="<?=$_POST['name']?>">
 		<input type="text" class="room_id" value="<?=$_POST['room_id']?>">
@@ -30,6 +31,8 @@
 		
 			<input type="file" name="upl[]" class="upl" multiple hidden>
 			<img class="preview">
+
+			<input type="file" name="attachment[]" class="attachment" multiple>
 		</p>
 		
 		<p>
