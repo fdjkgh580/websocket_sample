@@ -122,7 +122,7 @@ $(function (){
                     // 發送到對方
                     $.vmodel.get("websocket").send(data)
 
-                    // // 也傳到己方
+                    // // 也傳到己方(X)
                     // $.vmodel.get("chatHelper").new_message(data)
                     // $.vmodel.get("chatHelper").name_lcok();
 
@@ -142,8 +142,10 @@ $(function (){
                                 img: img
                             };
 
-                            console.log(data)
+                            $.vmodel.get("websocket").send(data)
 
+                            // 訊息滾到置底
+                            vs.scroll_bottom();
                         });
                     }
 

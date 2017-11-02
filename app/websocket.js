@@ -42,6 +42,9 @@ $(function (){
                 else if (obj.type == "leave") {
                     $.vmodel.get("chatHelper").leave(obj)
                 }
+                else if (obj.type == "media") {
+                    $.vmodel.get("chatHelper").new_media(obj)
+                }
                 else {
                     $.vmodel.get("chatHelper").debug('接收到的訊息無法分類');
                 }

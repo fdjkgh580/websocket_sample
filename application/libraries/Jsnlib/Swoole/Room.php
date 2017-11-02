@@ -384,6 +384,20 @@ class Room
 			if (empty($insert_id))
 				$this->command_line("寫入聊天紀錄錯誤，使用者 {$frame->fd}\n");
 		}
+		// 純媒體
+		elseif ($userdata['type'] == "media") 
+		{
+			$users = $this->push2users(
+			[
+				'ws' => $ws,
+				'room_id' => $userdata['room_id'],
+				'user_id' => $frame->fd,
+				'data' => $frame->data
+			]);
+			if (count($users) > 0)
+				$this->command_line("使用者 {$frame->fd} 發送訊息給成員: " . implode(",", $users) . "\n");
+
+		}
 		else
 		{
 			// 一般訊息，不寫入聊天紀錄

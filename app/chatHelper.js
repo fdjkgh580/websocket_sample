@@ -26,6 +26,30 @@ $(function (){
 
                 $(".chat").append(li)
             }
+
+            this.new_media = function (obj){
+                var media = JSON.parse(obj.message);
+
+                $.each(media, function (key, item){
+                    if (item.type == "image") {
+                        var li = 
+                        '<li>' + 
+                            "<span>" + obj.name + " 傳送圖片：" + "</span>" + 
+                            "&emsp;<img src='" + item.url + "' width='120'>" + 
+                        '</li>';
+                    }
+                    else if (item.type == "video") {
+                        var li = 
+                        '<li>' + 
+                            "<span>" + obj.name + " 傳送了影音：" + "</span>" + 
+                            "<video class='attachment_video' src='" + item.url + "' width='150' height='150' controls></video>"
+                        '</li>';
+                    }
+
+                    $(".chat").append(li)
+
+                });
+            }
             this.welcome = function (obj){
                 var username = $(".name").val();
 
