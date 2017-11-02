@@ -50,7 +50,7 @@ $(function (){
                 return val == "" ? false: true;
             }
 
-            this.submit_use_http = function (formthis){
+            this.submit_use_http = function (formthis, success){
                 var url = $(formthis).attr("data-attachment-url");
 
                 $(formthis).ajaxSubmit({
@@ -79,8 +79,7 @@ $(function (){
                         });
 
                         var encode = JSON.stringify(box);
-
-                        _set_message(encode);
+                        success.call(formthis, encode);
                     },
                     error: function (data){
                         console.log('error')
@@ -133,7 +132,19 @@ $(function (){
                     vs.reset_message();
 
                     if (vs.is_choice_attachement() === true) {
-                        vs.submit_use_http(this);
+                        vs.submit_use_http(this, function (encode){
+
+                            var data    = {
+                                type: 'media',
+                                room_id: room_id,
+                                name: name,
+                                message: encode,
+                                img: img
+                            };
+
+                            console.log(data)
+
+                        });
                     }
 
                     return false;
