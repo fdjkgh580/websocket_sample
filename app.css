@@ -1,5 +1,5 @@
-.chat {
-	height: 200px;
+.chat_wrap {
+	height: 320px;
 	background: #EEEEEE;
 	overflow: auto;
 }
@@ -14,3 +14,4 @@
 	background-size: contain;
 	background-repeat: no-repeat;
 }
+

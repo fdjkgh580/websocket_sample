@@ -3,6 +3,7 @@
 <head>
 	<title>Ratchet Test</title>
 	<base href="<?=site_url();?>">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
 	<meta charset="UTF-8"/>
 	<link rel="stylesheet" href="app.css">
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>

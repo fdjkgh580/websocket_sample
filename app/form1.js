@@ -7,6 +7,31 @@ $(function (){
             var vs = this;
             this.autoload = ['choice_image', 'trigger_preview', 'submit'];
             
+            // this.mediaload = function (){
+
+            //     vs.root.imagesLoaded(function (instance){
+            //         console.log(instance)
+            //     })
+
+            //     // $("img").imagesLoaded()
+            //     //     .always( function( instance ) {
+            //     //         alert('always')
+            //     //         console.log('all images loaded');
+            //     //     })
+            //     //     .done( function( instance ) {
+            //     //         console.log('all images successfully loaded');
+            //     //         alert('done')
+            //     //     })
+            //     //     .fail( function() {
+            //     //         console.log('all images loaded, at least one is broken');
+            //     //         alert('fail')
+            //     //     })
+            //     //     .progress( function( instance, image ) {
+            //     //         var result = image.isLoaded ? 'loaded' : 'broken';
+            //     //         console.log( 'image is ' + result + ' for ' + image.img.src );
+            //     //         alert('pogress')
+            //     // });
+            // }
             // 選擇圖片
             this.choice_image = function (){
                 vs.root.on("change", ".upl", function (){
@@ -41,7 +66,37 @@ $(function (){
 
             // 訊息滾到置底
             this.scroll_bottom = function (){
-                $("ul.chat").scrollTop($("ul.chat").height());
+                // 確保圖片讀取完畢
+                vs.root.imagesLoaded()
+                    .always( function( instance ) {
+                        // alert('always')
+                        console.log('all images loaded');
+                    })
+                    .done( function( instance ) {
+                        console.log('all images successfully loaded');
+                        // alert('done')
+
+                    })
+                    .fail( function() {
+                        console.log('all images loaded, at least one is broken');
+                        // alert('fail')
+                    })
+                    .progress( function( instance, image ) {
+                        var result = image.isLoaded ? 'loaded' : 'broken';
+                        console.log( 'image is ' + result + ' for ' + image.img.src );
+                        // alert('pogress')
+                        var h = vs.root.find(".chat").height();
+                        vs.root.find(".chat_wrap").scrollTop(h);
+                        console.log('scroll_bottom:' + h);
+                });
+
+
+
+
+                    
+
+
+                    
             }
 
             // 是否有夾帶附件
@@ -50,20 +105,19 @@ $(function (){
                 return val == "" ? false: true;
             }
 
-            this.submit_use_http = function (formthis, success){
+            this.submit_media = function (formthis, success){
                 var url = $(formthis).attr("data-attachment-url");
 
                 $(formthis).ajaxSubmit({
                     url: url,
-                    data: {
-                        say: 'hello',
-                    },
+                    data: {},
                     method: "POST", 
                     uploadProgress: function (event, position, total, percentComplete){
-                        console.log("附件上傳了 " + percentComplete + "%")
+                        vs.root.find(".uploadp").html("附件上傳了 " + percentComplete + "%")
                     },
                     success: function (obj){
-                        console.log(obj);
+                        vs.root.find(".uploadp").text(null)
+
                         var box = {};
 
                         $.each(obj, function (key, item){
@@ -133,7 +187,9 @@ $(function (){
                     vs.reset_message();
 
                     if (vs.is_choice_attachement() === true) {
-                        vs.submit_use_http(this, function (encode){
+
+
+                        vs.submit_media(this, function (encode){
 
                             var data    = {
                                 type: 'media',
@@ -144,9 +200,8 @@ $(function (){
                             };
 
                             $.vmodel.get("websocket").send(data)
-
-                            // 訊息滾到置底
-                            vs.scroll_bottom();
+                            vs.reset_message();
+                            vs.root.find(".attachment").val(null)
                         });
                     }
 

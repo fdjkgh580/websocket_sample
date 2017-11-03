@@ -18,10 +18,13 @@ $(function (){
              */
             this.new_message = function (obj){
 
+                var img = obj.img ? "&emsp;<img src='" + obj.img + "' width='120'>" : "";
+
+
                 var li = 
                     '<li>' + 
                         "<span>" + obj.name + " 說：" + obj.message + "</span>" + 
-                        "&emsp;<img src='" + obj.img + "' width='120'>" + 
+                        img
                     '</li>';
 
                 $(".chat").append(li)
@@ -50,7 +53,7 @@ $(function (){
                         var li = 
                         '<li>' + 
                             "<span>" + obj.name + " 傳送了檔案：" + "</span>" + 
-                            "<a href='" + item.url + "'>" + item.name + "</a>" +
+                            "<a target='blank' href='" + item.url + "'>" + item.name + "</a>" +
                         '</li>';
                     }
 

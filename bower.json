@@ -1,23 +1,24 @@
 {
-  "name": "websocket_sample",
-  "homepage": "https://github.com/fdjkgh580/websocket_sample",
-  "authors": [
-    "fdjkgh580 <fdjkgh580@yahoo.com.tw>"
-  ],
-  "dependencies": {
-    "jquery": "master",
-    "vmodel.js": "master",
-    "vpage.js": "master",
-    "file-preview.js": "master",
-    "jquery-form": "master"
-  },
-  "main": "",
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+    "name": "websocket_sample",
+    "homepage": "https://github.com/fdjkgh580/websocket_sample",
+    "authors": [
+        "fdjkgh580 <fdjkgh580@yahoo.com.tw>"
+    ],
+    "dependencies": {
+        "jquery": "master",
+        "vmodel.js": "master",
+        "vpage.js": "master",
+        "file-preview.js": "master",
+        "jquery-form": "master",
+        "imagesloaded": "^4.1.3"
+    },
+    "main": "",
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
 }
